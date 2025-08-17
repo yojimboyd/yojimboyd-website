@@ -12,14 +12,12 @@
 
 <style>
 :root{
-  /* Perspective + vanishing point */
   --vp-x: 50vw;
   --vp-y: 42vh;
   --persp: 1300px;
   --tilt: 22deg;
   --depth: 880px;
 
-  /* Midnight Runway palette */
   --tarmac:#020c1b;
   --terminal:#04142e;
   --sodium:#0a254d;
@@ -31,6 +29,9 @@
   --muted:#7da3c7;
 
   --glass-line: rgba(0, 200, 255, .22);
+
+  /* control lyric vertical position */
+  --lyrics-top: 48%;
 }
 
 *{ box-sizing:border-box; }
@@ -38,143 +39,208 @@ html,body{ height:100%; }
 body{
   margin:0; color:var(--white);
   font-family:"Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  background: transparent;         /* video shows through */
+  background:
+    radial-gradient(80vh 60vh at 50% 10%, #111a33 0%, transparent 60%),
+    radial-gradient(100vh 50vh at 50% 100%, #0b1220 0%, transparent 60%),
+    linear-gradient(var(--tarmac), var(--terminal) 40%, #070b12 100%);
   overflow-x:hidden;
 }
 
-/* Fullscreen YouTube video background */
-.bg-video{
-  position: fixed;
-  inset: 0;
-  z-index: -2;                     /* behind everything */
-  overflow: hidden;
-  pointer-events: none;
-}
-.bg-video iframe{
-  width: 100vw;
-  height: 56.25vw;                 /* 16:9 fit by width */
-  min-height: 100vh;
-  min-width: 177.78vh;             /* 16:9 fit by height */
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%,-50%);
-  filter: brightness(.75) saturate(1.05); /* keep content legible */
-}
+/* ===== Ambient ===== */
 
-/* Optional extra contrast (toggle opacity if needed) */
-.video-overlay{
-  position: fixed; inset:0; z-index:-1; pointer-events:none;
-  background: linear-gradient(180deg, rgba(0,8,20,.45), rgba(0,8,20,.25));
+/* People shadows drifting across fogged glass (3 layers) */
+.shadow-stream{
+  position:fixed; inset:-8vh -15vw; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(40vmin 12vmin at -20% 70%, #000a 45%, transparent 75%),
+    radial-gradient(36vmin 10vmin at 110% 65%, #0009 40%, transparent 72%),
+    radial-gradient(34vmin 10vmin at 30% 95%,  #0008 35%, transparent 70%),
+    radial-gradient(32vmin 10vmin at 70% 92%,  #0008 35%, transparent 70%);
+  mix-blend-mode:multiply;
+  filter: blur(3px) contrast(1.15);
+  animation: walk-left 28s linear infinite, sway 8s ease-in-out infinite alternate;
 }
+.shadow-stream::before{
+  content:""; position:absolute; inset:-6vh -12vw;
+  background:
+    radial-gradient(44vmin 13vmin at -10% 75%, #000c 50%, transparent 76%),
+    radial-gradient(38vmin 11vmin at 120% 60%, #000b 45%, transparent 72%),
+    radial-gradient(34vmin 11vmin at 20% 90%,  #000a 40%, transparent 72%),
+    radial-gradient(32vmin 11vmin at 78% 94%,  #000a 40%, transparent 72%);
+  mix-blend-mode:multiply;
+  filter: blur(3.5px) contrast(1.2);
+  animation: walk-right 22s linear infinite, sway 7s ease-in-out infinite alternate-reverse, pulse-blur 12s ease-in-out infinite;
+}
+.shadow-stream::after{
+  content:""; position:absolute; inset:-5vh -10vw;
+  background:
+    radial-gradient(46vmin 14vmin at -15% 78%, #000d 55%, transparent 78%),
+    radial-gradient(40vmin 12vmin at 115% 62%, #000c 50%, transparent 74%),
+    radial-gradient(36vmin 12vmin at 18% 96%,  #000b 45%, transparent 74%),
+    radial-gradient(34vmin 12vmin at 82% 96%,  #000b 45%, transparent 74%);
+  mix-blend-mode:multiply;
+  filter: blur(4px) contrast(1.25);
+  animation: walk-left 16s linear infinite, sway 6s ease-in-out infinite, pulse-blur 10s ease-in-out infinite reverse;
+}
+@keyframes walk-left{  0%{transform:translateX(40vw)} 100%{transform:translateX(-40vw)} }
+@keyframes walk-right{ 0%{transform:translateX(-46vw)} 100%{transform:translateX(46vw)} }
+@keyframes sway{ 0%{transform:translateY(0) scale(1)} 100%{transform:translateY(-1.2vh) scale(1.02)} }
+@keyframes pulse-blur{ 0%,100%{filter:blur(3px) contrast(1.15)} 50%{filter:blur(5px) contrast(1.1)} }
 
-/* Scene */
+/* Fog + stronger glass */
+.fog{
+  position:fixed; inset:-12vh -10vw; z-index:1; pointer-events:none;
+  background:
+    radial-gradient(70vh 34vh at 28% 72%,  #9db8ff26 0%, transparent 60%),
+    radial-gradient(60vh 28vh at 70% 34%,  #9db8ff1f 0%, transparent 60%),
+    radial-gradient(64vh 30vh at 72% 78%,  #ffd48024 0%, transparent 62%),
+    radial-gradient(52vh 24vh at 35% 28%,  #ffc86a1e 0%, transparent 62%);
+  filter: blur(14px) saturate(135%);
+  animation: fog-drift 32s ease-in-out infinite alternate, fog-parallax 48s linear infinite;
+}
+@keyframes fog-drift{ 0%{transform:translate3d(-3vw,.5vh,0)} 100%{transform:translate3d(3vw,-.5vh,0)} }
+@keyframes fog-parallax{ 0%{opacity:.38} 50%{opacity:.52} 100%{opacity:.38} }
+
+.glass-smear{
+  position:fixed; inset:0; z-index:1; pointer-events:none;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.03) 0 1px, transparent 1px 12px),
+    radial-gradient(120% 120% at 50% 50%, transparent 55%, rgba(0,0,0,.25) 100%),
+    radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,.08) 48%, transparent 52%),
+    radial-gradient(1px 1px at 60% 70%, rgba(255,255,255,.07) 48%, transparent 52%);
+  background-size:100% 100%,100% 100%,220px 220px,260px 260px;
+  mix-blend-mode: soft-light;
+  opacity:.22;
+  animation: smear-shift 24s linear infinite;
+  backdrop-filter: blur(2.5px) saturate(112%);
+}
+@keyframes smear-shift{ 0%{background-position:0 0,0 0,0 0} 100%{background-position:-4vw 0,-2vw 0,2vw 0} }
+
+/* ===== Layout ===== */
 .scene{
   position:relative; z-index:2; min-height:100svh;
   perspective: var(--persp);
   perspective-origin: var(--vp-x) var(--vp-y);
 }
 
-/* Title as a signage header */
+/* Title (SVG with neon flicker) */
 .header{
   position:relative; z-index:3;
   display:grid; place-items:center; margin: clamp(12px, 4vh, 28px) 0;
 }
-.wordmark{
-  font-family:"Barlow Condensed", system-ui, sans-serif;
-  font-weight:900;
-  font-size: clamp(42px, 9vw, 120px);
-  letter-spacing:.02em;
-  background: linear-gradient(180deg, var(--sign-yellow), var(--sign-amber));
-  -webkit-background-clip:text; background-clip:text; color:transparent;
-  text-shadow: 0 0 18px #00e6ff40, 0 0 42px #00e6ff26;
-  position:relative;
+.wordmark{ display:none!important; }
+.wordmark-wrap{ position:relative; display:inline-block; line-height:0; z-index:3; }
+.title-svg{
+  width:clamp(260px, 38vw, 920px);
+  height:auto; display:block;
+  filter:
+    drop-shadow(0 0 10px rgba(0,230,255,.35))
+    drop-shadow(0 0 28px rgba(0,198,255,.22));
+  animation: titleFlicker 7s infinite steps(1,end);
 }
-.wordmark::after{
-  content:""; position:absolute; left:0; right:0; bottom:.08em; height:2px;
-  background: linear-gradient(90deg, transparent, #00d8ff80 20%, transparent 50%, #00d8ff80 80%, transparent);
-  filter: blur(.5px); opacity:.6; animation: tube 6s ease-in-out infinite;
+.wordmark-wrap{ animation: titleJitter 7s infinite steps(1,end); }
+@keyframes titleFlicker{
+  0%,6%,9%,14%,20%,38%,42%,55%,62%,74%,86%,92%,100%{
+    opacity:1;
+    filter: drop-shadow(0 0 12px rgba(0,230,255,.55)) drop-shadow(0 0 36px rgba(0,198,255,.35)) drop-shadow(0 0 72px rgba(0,198,255,.25));
+  }
+  7%,15%,39%,56%{ opacity:.55; filter:none; }
+  24%,63%,88%   { opacity:.25; filter:none; }
 }
-@keyframes tube{ 0%,100%{opacity:.4} 50%{opacity:.9} }
+@keyframes titleJitter{
+  0%,100%{ transform:translate(0,0) }
+  7% { transform:translate(0.2px, 0.1px) }
+  15%{ transform:translate(-0.3px, 0.1px) }
+  24%{ transform:translate(0.1px,-0.2px) }
+  39%{ transform:translate(-0.2px,0.2px) }
+  56%{ transform:translate(0.2px,-0.1px) }
+  63%{ transform:translate(-0.1px,0.2px) }
+  88%{ transform:translate(0.1px,-0.1px) }
+}
+@media (prefers-reduced-motion: reduce){
+  .title-svg,.wordmark-wrap{ animation:none!important; }
+}
 
-/* ===== Background Lyric Board (fading, behind content) ===== */
+/* ===== Lyric board ===== */
 .lyric-board{
-  position:fixed;
-  left:50%; top:40%;
-  transform: translate(-50%,-50%);
-  z-index:1; /* stay behind cards */
-  pointer-events:none;
-  text-align:center;
-  width:min(92vw, 1200px);
-  opacity:.12; /* faint */
-  filter: blur(.1px);
+  position:fixed; left:50%; top:var(--lyrics-top);
+  transform:translate(-50%,-50%); z-index:2; pointer-events:none;
+  text-align:center; width:min(92vw,1200px);
+  line-height:1.1; opacity:.18; filter:blur(.1px);
 }
 .lyric-board .line{
-  font-family: "Barlow Condensed", system-ui, sans-serif;
-  font-weight:800;
-  letter-spacing:.08em;
-  text-transform:uppercase;
-  color:#d7f3ff;
-  font-size: clamp(18px, 2.6vw, 34px);
-  opacity:0;
-  animation: lyricFade 16s infinite;
+  font-family:"Barlow Condensed",system-ui,sans-serif; font-weight:800;
+  letter-spacing:.08em; text-transform:uppercase; color:#d7f3ff;
+  font-size:clamp(16px,2.2vw,30px);
+  opacity:0; animation: lyricFade 16s infinite;
+  position:relative; isolation:isolate; mix-blend-mode:screen;
+  text-shadow: 0 0 18px rgba(210,240,255,.35), 0 0 42px rgba(120,210,255,.25);
 }
-.lyric-board .line:nth-child(2){ animation-delay: 4s; }
-.lyric-board .line:nth-child(3){ animation-delay: 8s; }
-.lyric-board .line:nth-child(4){ animation-delay: 12s; }
+.lyric-board .line::after{
+  content:attr(data-text); position:absolute; inset:0; color:#d7f3ff;
+  opacity:0; filter: blur(6px) contrast(1.05); transform: translateY(0);
+  pointer-events:none; mix-blend-mode:screen;
+  -webkit-mask: linear-gradient(180deg, rgba(0,0,0,.9), rgba(0,0,0,.35) 60%, transparent);
+          mask: linear-gradient(180deg, rgba(0,0,0,.9), rgba(0,0,0,.35) 60%, transparent);
+  animation: smokeTrail 16s ease-in-out infinite;
+  animation-delay: var(--smoke-delay,0s);
+}
 @keyframes lyricFade{
-  0%,20%{opacity:0; transform: translateY(6px)}
-  30%,60%{opacity:1; transform: translateY(0)}
-  80%,100%{opacity:0; transform: translateY(-6px)}
+  0%,20%{opacity:0; transform:translateY(6px)}
+  30%,60%{opacity:1; transform:translateY(0)}
+  80%,100%{opacity:0; transform:translateY(-6px)}
+}
+@keyframes smokeTrail{
+  0%,24%{opacity:0; transform:translateY(2px)}
+  30%{opacity:.35; transform:translateY(0)}
+  55%{opacity:.22; transform:translateY(-4px)}
+  75%{opacity:.10; transform:translateY(-8px)}
+  100%{opacity:0; transform:translateY(-10px)}
 }
 
-/* ===== Perspective Cards (foreground) ===== */
+/* ===== Cards (no hover lift) ===== */
 .cards{
-  position:relative; z-index:4; /* in front of lyric board */
-  display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); /* collapses exactly when needed */
-  gap: 2.2rem;
-  width:min(1300px, 92vw);
-  margin: clamp(4px, 2vh, 16px) auto 0;
+  position:relative; z-index:5; /* above ambient layers */
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(420px,1fr));
+  gap:2.2rem; width:min(1300px,92vw);
+  margin: clamp(4px,2vh,16px) auto 0;
   transform-style: preserve-3d;
 }
 .card{
-  position:relative;
-  min-height: 430px;
-  border-radius: 16px;
-  overflow:hidden;
+  position:relative; min-height:430px; border-radius:16px; overflow:hidden;
   background: linear-gradient(180deg, rgba(6,10,18,.85), rgba(10,16,28,.85));
   border:1px solid var(--glass-line);
   box-shadow: 0 46px 110px rgba(0,0,0,.65), inset 0 2px 0 rgba(255,255,255,.07);
-  transition: transform .5s ease;
 }
-.card.left  { transform: rotateY(var(--tilt))  translateZ(calc(var(--depth) * -1)) translateX(-2.2vw); transform-origin:right center; }
-.card.right { transform: rotateY(calc(var(--tilt) * -1)) translateZ(calc(var(--depth) * -1)) translateX( 2.2vw); transform-origin:left  center; }
-/* keep angle on hover (no popout) */
+.card.left  { transform: rotateY(var(--tilt))  translateZ(calc(var(--depth)*-1)) translateX(-2.2vw); transform-origin:right center; }
+.card.right { transform: rotateY(calc(var(--tilt)*-1)) translateZ(calc(var(--depth)*-1)) translateX( 2.2vw); transform-origin:left  center; }
 
-/* Labels */
-.card .label{
-  position:absolute; left:0; right:0; top:0; padding:12px 16px;
-  text-transform:uppercase; letter-spacing:.14em; font-weight:800; color:#05121f;
-  background: linear-gradient(180deg, var(--sign-yellow), var(--sign-amber));
-  border-bottom:1px solid #0002; box-shadow: inset 0 1px 0 #fff5;
-}
-
-/* Video */
-.card.video .inside{ position:absolute; inset:56px 18px 18px; border-radius:14px; overflow:hidden; border:1px solid rgba(255,255,255,.16); background:#0008; }
+.card .inside{ position:absolute; inset:16px; border-radius:14px; }
 .card.video iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; }
 
 /* Dates */
-.card.dates .inside{ position:absolute; inset:56px 16px 16px; padding:14px; border-radius:14px; background: linear-gradient(180deg, #0e1422cc, #0a0f18cc); border:1px solid rgba(255,255,255,.16); }
 .dates-list{ list-style:none; padding:0; margin:0; }
-.dates-list li{ display:flex; justify-content:space-between; padding:12px 10px; border-bottom:1px dashed rgba(255,255,255,.18); font-size:1.05rem; }
+.dates-list li{
+  display:flex; justify-content:space-between; align-items:baseline;
+  gap:12px; padding:12px 10px;
+  border-bottom:1px dashed rgba(255,255,255,.18); font-size:1.05rem;
+}
 .dates-list li:last-child{ border-bottom:none; }
 .dates-list strong{ color:#eaf2ff; }
 .dates-list span{ color:var(--muted); }
+.dates-list strong small{ font-weight:400; color:var(--muted); margin-left:6px; font-size:.95em; }
+.dates-list li.past strong,
+.dates-list li.past span{
+  color: var(--muted); opacity:.85;
+  text-decoration: line-through;
+  text-decoration-color: var(--sign-amber);
+  text-decoration-thickness: 2px;
+  text-decoration-skip-ink: auto;
+}
 
-/* Listen (boarding-pass grid that fills the space) */
+/* Listen (unchanged boarding passes) */
 .card.listen .inside{
-  position:absolute; inset:56px 16px 16px;
+  position:absolute; inset:16px; border-radius:14px;
   display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:14px;
 }
 @media (max-width:760px){ .card.listen .inside{ grid-template-columns:1fr; } }
@@ -191,66 +257,190 @@ body{
 .pass.violet{  background:linear-gradient(180deg,#efe9ff,#ddccff); }
 .pass.mint{    background:linear-gradient(180deg,#e8fff7,#caffee); }
 
-/* Photos */
+/* Photos — grid + lightbox */
 .card.photos .inside{
-  position:absolute; inset:56px 16px 16px;
+  position:absolute; inset:16px; border-radius:14px;
   display:grid; grid-template-columns:repeat(2,1fr); gap:12px;
 }
 .card.photos img{
-  width:100%; height:160px; object-fit:cover; border-radius:10px; opacity:.95;
-  filter:saturate(1.05) contrast(1.03);
+  width:100%; height:180px; object-fit:cover;
+  border-radius:10px; opacity:.95; filter:saturate(1.05) contrast(1.03);
+  cursor:pointer;
 }
+.lightbox{
+  position:fixed; inset:0; z-index:9999; display:none;
+  background: rgba(1,6,12,.85);
+  backdrop-filter: blur(2px) saturate(110%);
+}
+.lightbox.open{ display:flex; align-items:center; justify-content:center; }
+.lightbox img{
+  max-width: min(92vw, 1400px);
+  max-height: 86vh;
+  width:auto; height:auto; object-fit:contain;
+  box-shadow: 0 40px 120px rgba(0,0,0,.75);
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:12px;
+}
+.lb-close, .lb-prev, .lb-next{
+  position:fixed; top:50%; transform:translateY(-50%);
+  background: rgba(0,0,0,.45); color:#e2f7ff; border:1px solid rgba(255,255,255,.2);
+  padding:10px 14px; border-radius:10px; cursor:pointer; user-select:none;
+  font-size:14px; letter-spacing:.06em;
+}
+.lb-close{ top: 8%; right: 4%; transform:none; }
+.lb-prev { left: 3%; }
+.lb-next { right: 3%; }
+.lb-close:hover, .lb-prev:hover, .lb-next:hover{
+  background: rgba(0,0,0,.65);
+}
+
+/* ===== STREAM card (compact/snug) ===== */
+.card.stream{
+  min-height:auto;            /* dynamic height based on content */
+  padding-block: 18px;
+}
+.card.stream .inside{
+  position:static;            /* let content size the card */
+  inset:auto; border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+}
+.stream-cta{
+  appearance:none; border:1px solid var(--glass-line);
+  background: linear-gradient(180deg, rgba(8,14,24,.9), rgba(10,16,28,.85));
+  color:#e2f7ff; font-weight:800; letter-spacing:.14em; text-transform:uppercase;
+  padding:16px 24px; border-radius:12px; cursor:pointer;
+  text-shadow: 0 0 14px rgba(0,230,255,.25);
+  box-shadow: 0 10px 28px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.08);
+  animation: btnFlicker 4s infinite;
+}
+.stream-cta:focus-visible{ outline:2px solid #00e6ff; outline-offset:3px; }
+
+/* Neon flicker for button */
+@keyframes btnFlicker {
+  0%, 18%, 22%, 25%, 53%, 57%, 100% {
+    color: #00eaff;
+    text-shadow: 0 0 6px #00eaff, 0 0 14px #00eaff, 0 0 28px #00eaff;
+    opacity: 1;
+  }
+  12%, 20%, 24%, 40%, 55%, 80% {
+    color: #7dfbff;
+    text-shadow: 0 0 4px #7dfbff, 0 0 10px #7dfbff;
+    opacity: 0.8;
+  }
+  30%, 65%, 90% {
+    color: #00c6ff;
+    text-shadow: 0 0 5px #00c6ff, 0 0 12px #00c6ff;
+    opacity: 0.92;
+  }
+}
+
+/* STREAM modal */
+.stream-modal{
+  position:fixed; inset:0; z-index:10050; display:none;
+  align-items:center; justify-content:center;
+  background: rgba(2, 8, 18, .65);
+  backdrop-filter: blur(3px) saturate(112%);
+}
+.stream-modal.open{ display:flex; }
+.stream-panel{
+  width:min(92vw, 780px);
+  border-radius:16px;
+  background: linear-gradient(180deg, rgba(6,10,18,.94), rgba(10,16,28,.92));
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow: 0 60px 160px rgba(0,0,0,.7), 0 0 80px rgba(0,200,255,.15);
+  padding: clamp(16px, 3.2vw, 28px);
+  transform: translateY(8px);
+  opacity:0;
+  animation: panelIn .7s ease-out forwards;
+}
+@keyframes panelIn{
+  0%  { opacity:0; transform:translateY(10px) }
+  60% { opacity:1; transform:translateY(0) }
+  100%{ opacity:1; transform:translateY(0) }
+}
+.stream-title{
+  margin:0 0 14px 0;
+  font-family:"Barlow Condensed", system-ui, sans-serif;
+  font-weight:900; letter-spacing:.12em; text-transform:uppercase;
+  font-size: clamp(22px, 5.2vw, 44px);
+  color:#d7f3ff;
+  text-align:center;
+  position:relative;
+  text-shadow: 0 0 20px rgba(120,210,255,.28);
+}
+.stream-title::after{
+  content:""; display:block; height:2px; margin:10px auto 0;
+  width:220px; max-width:60%;
+  background: linear-gradient(90deg, transparent, #00d8ff80 25%, transparent 75%, #00d8ff60 90%, transparent);
+  filter: blur(.4px); opacity:.75;
+}
+.stream-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap:12px;
+  margin-top: 12px;
+}
+.stream-link{
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  text-decoration:none; font-weight:800;
+  color:#0b0f14; background:#fff; border:1px solid #fff;
+  border-radius:12px; padding:14px 14px;
+  box-shadow: 0 10px 28px rgba(0,0,0,.35);
+  transition: transform .18s ease, filter .18s ease;
+  opacity:0; transform: translateY(6px);
+  animation: itemIn .6s ease-out forwards;
+}
+@keyframes itemIn{ to{ opacity:1; transform: translateY(0); } }
+.stream-link:hover{ transform: translateY(-2px); filter: brightness(1.04); }
+.stream-link small{ font-weight:600; color:#234; letter-spacing:.02em; }
+.stream-link.cyan   { background:linear-gradient(180deg,#e6fbff,#c9f5ff); }
+.stream-link.amber  { background:linear-gradient(180deg,#dff7ff,#bfeeff); color:#002233; }
+.stream-link.violet { background:linear-gradient(180deg,#efe9ff,#ddccff); }
+.stream-link.mint   { background:linear-gradient(180deg,#e8fff7,#caffee); }
+
+.stream-actions{
+  margin-top:16px; display:flex; justify-content:center; gap:12px; flex-wrap:wrap;
+}
+.btn-ghost{
+  appearance:none; cursor:pointer;
+  border-radius:10px; border:1px solid rgba(255,255,255,.18);
+  background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+  color:#e2f7ff; padding:10px 14px; letter-spacing:.06em;
+}
+.btn-ghost:focus-visible{ outline:2px solid #00e6ff; outline-offset:3px; }
 
 /* Footer */
 footer{ text-align:center; color:var(--muted); padding:56px 0 80px; }
 
-@media (max-width: 980px){
+@media (max-width:980px){
   .cards{ grid-template-columns:1fr; }
-  .card.left,.card.right{ transform:none; }
   .card{ min-height:360px; }
-}
-
-/* Reduced motion: hide video, show a static gradient fallback */
-@media (prefers-reduced-motion: reduce){
-  .bg-video{ display:none; }
-  .video-overlay{ display:none; }
-  body{
-    background:
-      radial-gradient(80vh 60vh at 50% 10%, #111a33 0%, transparent 60%),
-      radial-gradient(100vh 50vh at 50% 100%, #0b1220 0%, transparent 60%),
-      linear-gradient(var(--tarmac), var(--terminal) 40%, #070b12 100%);
-  }
+  .card.left,.card.right{ transform:none; }
 }
 </style>
 </head>
 <body>
 
-<!-- Fullscreen Background Video -->
-<div class="bg-video">
-  <iframe
-    src="https://www.youtube.com/embed/7kYr5IXa4a0?autoplay=1&mute=1&loop=1&playlist=7kYr5IXa4a0&controls=0&showinfo=0&modestbranding=1&playsinline=1&rel=0"
-    title="Background Video"
-    frameborder="0"
-    allow="autoplay; fullscreen"
-    allowfullscreen
-  ></iframe>
-</div>
-<div class="video-overlay" aria-hidden="true"></div>
+<!-- Ambient layers -->
+<div class="shadow-stream" aria-hidden="true"></div>
+<div class="fog" aria-hidden="true"></div>
+<div class="glass-smear" aria-hidden="true"></div>
 
 <div class="scene">
   <!-- Title -->
   <div class="header">
-    <div class="wordmark">James&nbsp;Boyd</div>
+    <div class="wordmark-wrap">
+      <img src="images/title.svg" alt="James Boyd" class="title-svg">
+    </div>
   </div>
 
-  <!-- BACKGROUND LYRIC BOARD (fades, behind cards) -->
+  <!-- Background lyric board -->
   <div class="lyric-board" id="lyric-board"></div>
 
-  <!-- FOREGROUND PERSPECTIVE CARDS -->
-  <section class="cards">
+  <!-- Cards -->
+  <div class="cards" id="cards">
     <!-- Video -->
     <article class="card video left">
-      <div class="label">Video</div>
       <div class="inside">
         <iframe
           src="https://www.youtube.com/embed/5g09jWyo_8k"
@@ -262,49 +452,53 @@ footer{ text-align:center; color:var(--muted); padding:56px 0 80px; }
 
     <!-- Dates -->
     <article class="card dates right">
-      <div class="label">Upcoming Dates</div>
       <div class="inside">
         <ul class="dates-list" id="dates-list"></ul>
       </div>
     </article>
 
-    <!-- Listen -->
-    <article class="card listen left">
-      <div class="label">Listen</div>
+    <!-- STREAM (snug) -->
+    <article class="card stream left">
       <div class="inside">
-        <!-- Replace # with your URLs -->
-        <a class="pass cyan"   href="#" target="_blank" rel="noopener">Spotify</a>
-        <a class="pass amber"  href="#" target="_blank" rel="noopener">Apple Music</a>
-        <a class="pass violet" href="#" target="_blank" rel="noopener">Amazon Music</a>
-        <a class="pass mint"   href="#" target="_blank" rel="noopener">TIDAL</a>
+        <button id="open-stream" class="stream-cta" aria-haspopup="dialog" aria-controls="stream-modal">
+          STREAM
+        </button>
       </div>
     </article>
 
-    <!-- Photos -->
+    <!-- Photos (gallery) -->
     <article class="card photos right">
-      <div class="label">Photos</div>
       <div class="inside">
-        <img src="images/jamesChair.jpg" alt="James on chair">
-        <img src="images/jamesEye.png" alt="James London Eye">
-        <img src="images/jamesNoGuitar.jpg" alt="James No Guitar">
-        <img src="images/jamesSunset.jpg" alt="James Sunset">
+        <img src="images/jamesChair.jpg"   alt="James on chair"       data-full="images/jamesChair.jpg">
+        <img src="images/jamesEye.png"     alt="James London Eye"     data-full="images/jamesEye.png">
+        <img src="images/jamesNoGuitar.jpg" alt="James No Guitar"     data-full="images/jamesNoGuitar.jpg">
+        <img src="images/jamesSunset.jpg"  alt="James Sunset"         data-full="images/jamesSunset.jpg">
       </div>
     </article>
-  </section>
+  </div>
 </div>
 
 <footer>© <span id="year"></span> James Boyd</footer>
 
-<!-- ===== Inline JSON (edit here) ===== -->
+<!-- ===== Dates data ===== -->
 <script id="dates-data" type="application/json">
 [
-  { "date":"2025-09-10", "city":"London, UK" },
-  { "date":"2025-09-18", "city":"Manchester, UK" },
-  { "date":"2025-10-02", "city":"Dublin, IE" }
+  { "date":"2025-06-27", "time":"19:00", "city":"The Old Frizzle, Wimbledon" },
+  { "date":"2025-06-28", "time":"19:00", "city":"The Regent, Balham" },
+  { "date":"2025-07-20", "time":"14:00", "city":"The Old Justice" },
+  { "date":"2025-07-27", "time":"14:00", "city":"Merton Abbey Mills" },
+  { "date":"2025-08-03", "time":"12:00", "city":"The Piazza, Wimbledon" },
+  { "date":"2025-08-10", "time":"16:30", "city":"The Old Justice, Bermondsey" },
+  { "date":"2025-08-16", "time":"14:00", "city":"Merton Abbey Mills" },
+  { "date":"2025-09-06", "time":"12:30", "city":"Merton Abbey Mills" },
+  { "date":"2025-09-14", "time":"12:30", "city":"Merton Abbey Mills" },
+  { "date":"2025-09-17", "time":"19:00", "city":"Hard Rock Cafe, Piccadilly Circus" },
+  { "date":"2025-09-18", "time":"18:30", "city":"Hard Rock Cafe, Old Park Lane" },
+  { "date":"2025-09-21", "time":"12:00", "city":"The Piazza, Wimbledon" }
 ]
 </script>
 
-<!-- Lyric lines for the background board -->
+<!-- ===== Lyrics data (kept, as requested) ===== -->
 <script id="lyrics-data" type="application/json">
 [
   "faces through the trees",
@@ -329,7 +523,74 @@ footer{ text-align:center; color:var(--muted); padding:56px 0 80px; }
   "into pieces",
   "all those days",
   "what's wrong with me?",
-  "all the worry left"
+  "all the worry left",
+  "blip on the radar",
+  "smudge on the screen",
+  "oh just a hiccup",
+  "in the programming",
+  "sound on the sonar",
+  "up from the deep",
+  "it's just ice cracking",
+  "where I should be",
+  "slip of the tongue",
+  "haunts you",
+  "at midnight",
+  "with other lies",
+  "we're the lovers",
+  "strangers wanting more",
+  "my foot in the door",
+  "one of those faces",
+  "somehow just believed",
+  "dreamt her up for me",
+  "her name in a song",
+  "to be a muse",
+  "paint her wrong",
+  "life's so very long",
+  "little genre piece",
+  "modern horror",
+  "ain't the universe",
+  "where my piece belongs",
+  "bent out of shape",
+  "looking wrong",
+  "make bets so long",
+  "if I just stay strong",
+  "at night",
+  "we all want a witness",
+  "leave the light on",
+  "you're the one",
+  "who did this",
+  "life began",
+  "wasted my youth",
+  "to start again",
+  "make a friend",
+  "after glow",
+  "a time I felt at home",
+  "giant sky",
+  "world below",
+  "long burnt cold",
+  "the wave that comes",
+  "i'd be there",
+  "looking back",
+  "waves rolling",
+  "out of reach",
+  "someone was yelling",
+  "head in the sand",
+  "time is upon us",
+  "man with no plan",
+  "as it stands",
+  "can't feel the sand",
+  "treading water",
+  "losing sight of land",
+  "drowning at a glance",
+  "one day will come",
+  "all for naught",
+  "all those things",
+  "everything not taken",
+  "left behind",
+  "wave in the wake",
+  "gonna be okay",
+  "gonna be alright",
+  "gonna be just fine"
 ]
 </script>
 
@@ -337,44 +598,177 @@ footer{ text-align:center; color:var(--muted); padding:56px 0 80px; }
 /* Footer year */
 document.getElementById('year').textContent = new Date().getFullYear();
 
-/* Render dates from JSON */
+/* Date util */
+function parseLocalDate(iso){
+  const [y,m,d] = iso.split('-').map(Number);
+  return new Date(y,(m-1),d);
+}
+
+/* Render dates: upcoming, then backfill past, chronological */
 (() => {
   const list = document.getElementById('dates-list');
   const raw = document.getElementById('dates-data');
   if (!list || !raw) return;
+
   let items = [];
   try { items = JSON.parse(raw.textContent.trim()); } catch(e){ items = []; }
-  items.sort((a,b)=> new Date(a.date) - new Date(b.date));
-  list.innerHTML = items.map(it=>{
-    const d = new Date(it.date + 'T12:00:00');
-    const pretty = d.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'2-digit'});
-    return `<li><strong>${pretty}</strong><span> — ${it.city||""}</span></li>`;
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  const withDates = items.map(it => ({...it, _d: parseLocalDate(it.date)}));
+  const upcoming = withDates.filter(it => it._d >= today).sort((a,b)=>a._d-b._d);
+  const past     = withDates.filter(it => it._d <  today).sort((a,b)=>a._d-b._d);
+
+  const TARGET = 9;
+  let result = [...upcoming];
+  if (result.length < TARGET){
+    const need = TARGET - result.length;
+    result = result.concat(past.slice(-need));
+  }
+  result.sort((a,b)=>a._d-b._d);
+
+  list.innerHTML = result.map(it=>{
+    const pretty = it._d.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'2-digit'});
+    const time = it.time ? ` <small>${it.time}</small>` : "";
+    const isPast = it._d < today;
+    return `<li class="${isPast?'past':''}">
+      <strong>${pretty}${time}</strong>
+      <span> — ${it.city||""}</span>
+    </li>`;
   }).join('');
 })();
 
-/* Build the background lyric board (fading) */
+/* Build the lyric board — 13 lines with smoke trails and staggered starts */
 (() => {
   const mount = document.getElementById('lyric-board');
   const raw = document.getElementById('lyrics-data');
   if (!mount || !raw) return;
+
   let lines = [];
   try { lines = JSON.parse(raw.textContent.trim()); } catch(e){ lines = []; }
   if (!lines.length) return;
 
-  // Shuffle a copy so order varies
-  lines = lines.slice().sort(()=> Math.random() - 0.5);
-
-  // Render up to 10 lines
-  const count = Math.min(lines.length, 10);
-  for (let i=0; i<count; i++){
-    const div = document.createElement('div');
-    div.className = 'line';
-    div.textContent = lines[i].toUpperCase();
-    div.style.animationDelay = `${i * 3.2}s`;  // stagger
-    mount.appendChild(div);
+  lines = lines.sort(()=>Math.random()-0.5);
+  const take = Math.min(lines.length, 13);
+  const STAGGER = 2.2;
+  for (let i=0;i<take;i++){
+    const d = document.createElement('div');
+    d.className = 'line';
+    d.textContent = lines[i].toUpperCase();
+    d.dataset.text = d.textContent;
+    d.style.animationDelay = `${i*STAGGER}s`;
+    d.style.setProperty('--smoke-delay', `${i*STAGGER}s`);
+    mount.appendChild(d);
   }
+})();
+
+/* Lightbox gallery for Photos */
+(() => {
+  const thumbs = Array.from(document.querySelectorAll('.card.photos img'));
+  if (!thumbs.length) return;
+
+  const lb = document.createElement('div');
+  lb.className = 'lightbox';
+  lb.innerHTML = `
+    <button class="lb-close" aria-label="Close">Close ✕</button>
+    <button class="lb-prev"  aria-label="Previous">‹ Prev</button>
+    <img alt="">
+    <button class="lb-next"  aria-label="Next">Next ›</button>
+  `;
+  document.body.appendChild(lb);
+
+  const img = lb.querySelector('img');
+  const btnClose = lb.querySelector('.lb-close');
+  const btnPrev  = lb.querySelector('.lb-prev');
+  const btnNext  = lb.querySelector('.lb-next');
+
+  let idx = 0;
+
+  function open(i){
+    idx = i;
+    const src = thumbs[idx].dataset.full || thumbs[idx].src;
+    img.src = src;
+    img.alt = thumbs[idx].alt || '';
+    lb.classList.add('open');
+  }
+  function close(){ lb.classList.remove('open'); img.src = ''; }
+  function prev(){ open((idx - 1 + thumbs.length) % thumbs.length); }
+  function next(){ open((idx + 1) % thumbs.length); }
+
+  thumbs.forEach((t,i)=> t.addEventListener('click', ()=> open(i)));
+  btnClose.addEventListener('click', close);
+  btnPrev.addEventListener('click', prev);
+  btnNext.addEventListener('click', next);
+  lb.addEventListener('click', (e)=> { if(e.target === lb) close(); });
+  window.addEventListener('keydown', (e)=>{
+    if(!lb.classList.contains('open')) return;
+    if(e.key === 'Escape') close();
+    if(e.key === 'ArrowLeft') prev();
+    if(e.key === 'ArrowRight') next();
+  });
+})();
+</script>
+
+<!-- STREAM modal markup -->
+<div class="stream-modal" id="stream-modal" role="dialog" aria-modal="true" aria-labelledby="stream-title" aria-hidden="true">
+  <div class="stream-panel">
+    <h2 id="stream-title" class="stream-title">Stream “Into Pieces”</h2>
+
+    <div class="stream-grid" id="stream-grid">
+      <a class="stream-link cyan"   href="https://open.spotify.com/album/0a3edtdtT85aYlUaVcSBta?si=54cuabmkRwi3AV9nAxSvEQ" target="_blank" rel="noopener">
+        <span>Spotify</span>
+      </a>
+      <a class="stream-link amber"  href="https://music.apple.com/ua/album/into-pieces-ep/1799751367" target="_blank" rel="noopener">
+        <span>Apple Music</span>
+      </a>
+      <a class="stream-link violet" href="https://www.amazon.com/Into-Pieces-James-Boyd/dp/B0DZ1DF8BY" target="_blank" rel="noopener">
+        <span>Amazon Music</span>
+      </a>
+      <a class="stream-link mint"   href="#" target="_blank" rel="noopener">
+        <span>TIDAL</span> <small>(coming soon)</small>
+      </a>
+      <a class="stream-link cyan"   href="https://music.youtube.com/search?q=James%20Boyd%20Into%20Pieces" target="_blank" rel="noopener">
+        <span>YouTube Music</span>
+      </a>
+      <a class="stream-link amber"  href="https://soundcloud.com/search?q=James%20Boyd%20Into%20Pieces" target="_blank" rel="noopener">
+        <span>SoundCloud</span>
+      </a>
+    </div>
+
+    <div class="stream-actions">
+      <button class="btn-ghost" id="close-stream">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* STREAM modal JS */
+(() => {
+  const openBtn = document.getElementById('open-stream');
+  const modal   = document.getElementById('stream-modal');
+  const closeBtn= document.getElementById('close-stream');
+  const grid    = document.getElementById('stream-grid');
+
+  if (!openBtn || !modal) return;
+
+  function openModal(){
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden','false');
+    Array.from(grid?.children || []).forEach((el,i)=>{
+      el.style.animationDelay = `${0.08 * i + 0.12}s`;
+    });
+    closeBtn?.focus();
+  }
+  function closeModal(){
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden','true');
+    openBtn?.focus();
+  }
+
+  openBtn.addEventListener('click', openModal);
+  closeBtn?.addEventListener('click', closeModal);
+  modal.addEventListener('click', (e)=>{ if (e.target === modal) closeModal(); });
+  window.addEventListener('keydown', (e)=>{ if (modal.classList.contains('open') && e.key === 'Escape') closeModal(); });
 })();
 </script>
 </body>
 </html>
-
