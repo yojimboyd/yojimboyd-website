@@ -31,10 +31,8 @@
   --sign-amber:#00c6ff;
   --white:#e2f7ff;
   --muted:#7da3c7;
-
   --glass-line: rgba(0, 200, 255, .22);
-
-  /* control lyric vertical position */
+  
   --lyrics-top: 60%;
 }
 
@@ -100,7 +98,7 @@ body{
     radial-gradient(64vh 30vh at 72% 78%,  #ffd48024 0%, transparent 62%),
     radial-gradient(52vh 24vh at 35% 28%,  #ffc86a1e 0%, transparent 62%);
   filter: blur(14px) saturate(135%);
-  animation: fog-drift 32s ease-in-out infinite alternate, fog-parallax 48s linear infinite;
+  animation: fog-drift 3s ease-in-out infinite alternate, fog-parallax 48s linear infinite;
 }
 @keyframes fog-drift{ 0%{transform:translate3d(-3vw,.5vh,0)} 100%{transform:translate3d(3vw,-.5vh,0)} }
 @keyframes fog-parallax{ 0%{opacity:.38} 50%{opacity:.52} 100%{opacity:.38} }
@@ -819,3 +817,4 @@ function parseLocalDate(iso){
 </script>
 </body>
 </html>
+
