@@ -13,10 +13,14 @@
 <style>
 :root{
   --vp-x: 50vw;
-  --vp-y: 42vh;
-  --persp: 1300px;
-  --tilt: 22deg;
-  --depth: 880px;
+  --vp-y: 48vh;
+  --persp: 2000px;
+  --tilt: 15deg;
+  --depth: 400px;
+  --skew-offset: clamp(8px, .9vw, 18px);
+  --nudge-x: 0vw;
+  --gap: 17rem;
+  --skew-x: 2.8vw;
 
   --tarmac:#020c1b;
   --terminal:#04142e;
@@ -31,7 +35,7 @@
   --glass-line: rgba(0, 200, 255, .22);
 
   /* control lyric vertical position */
-  --lyrics-top: 48%;
+  --lyrics-top: 60%;
 }
 
 *{ box-sizing:border-box; }
@@ -159,6 +163,9 @@ body{
 }
 @media (prefers-reduced-motion: reduce){
   .title-svg,.wordmark-wrap{ animation:none!important; }
+  .shadow-stream, .shadow-stream::before, .shadow-stream::after,
+  .fog, .glass-smear { animation: none !important; }
+  /* keep lyric + stream-cta animations running */
 }
 
 /* ===== Lyric board ===== */
@@ -198,13 +205,18 @@ body{
   100%{opacity:0; transform:translateY(-10px)}
 }
 
-/* ===== Cards (no hover lift) ===== */
 .cards{
-  position:relative; z-index:5; /* above ambient layers */
-  display:grid; grid-template-columns:repeat(auto-fit,minmax(420px,1fr));
-  gap:2.2rem; width:min(1300px,92vw);
+  position:relative; z-index:4;
+  display:grid; 
+  grid-template-columns:repeat(auto-fit,minmax(420px,1fr));
+  gap:2.2rem; width:min(1500px,92vw);
   margin: clamp(4px,2vh,16px) auto 0;
-  transform-style: preserve-3d;
+  perspective: var(--persp);
+  perspective-origin: 50% var(--vp-y);
+  transform-style: preserve-3d; 
+  transform: translateX(var(--nudge-x));
+  column-gap: var(--gap);     
+  row-gap: 3rem; 
 }
 .card{
   position:relative; min-height:430px; border-radius:16px; overflow:hidden;
@@ -212,11 +224,48 @@ body{
   border:1px solid var(--glass-line);
   box-shadow: 0 46px 110px rgba(0,0,0,.65), inset 0 2px 0 rgba(255,255,255,.07);
 }
-.card.left  { transform: rotateY(var(--tilt))  translateZ(calc(var(--depth)*-1)) translateX(-2.2vw); transform-origin:right center; }
-.card.right { transform: rotateY(calc(var(--tilt)*-1)) translateZ(calc(var(--depth)*-1)) translateX( 2.2vw); transform-origin:left  center; }
 
-.card .inside{ position:absolute; inset:16px; border-radius:14px; }
-.card.video iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; }
+.card.stream { 
+  z-index: 5; 
+}
+
+.card.left{
+  transform-origin: right center;
+  transform: rotateY(var(--tilt))
+  translateZ(calc(var(--depth)*-1))
+  translateX(calc(-1 * var(--skew-offset)));
+}
+
+.card.right{
+  transform-origin: left center;
+  transform: rotateY(calc(var(--tilt)*-1))
+  translateZ(calc(var(--depth)*-1))
+  translateX(var(--skew-offset));
+}
+
+.card .inside{ 
+  position:absolute; 
+  inset:16px; 
+  border-radius:14px; 
+}
+
+.card.video  { 
+  z-index: 1; 
+}
+
+.card.video iframe{ 
+  position:absolute; 
+  z-index: 1;
+  inset:0; 
+  width:100%; 
+  height:100%; 
+  border:0; 
+  pointer-events: auto;
+}
+
+.card.stream{ 
+  z-index: 5; 
+}
 
 /* Dates */
 .dates-list{ list-style:none; padding:0; margin:0; }
@@ -238,25 +287,6 @@ body{
   text-decoration-skip-ink: auto;
 }
 
-/* Listen (unchanged boarding passes) */
-.card.listen .inside{
-  position:absolute; inset:16px; border-radius:14px;
-  display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:14px;
-}
-@media (max-width:760px){ .card.listen .inside{ grid-template-columns:1fr; } }
-.pass{
-  display:flex; align-items:center; justify-content:center; text-align:center;
-  padding:18px 16px; border-radius:12px; text-decoration:none; font-weight:800;
-  color:#0b0f14; background:#fff;
-  border:1px solid #fff; box-shadow: 0 10px 28px rgba(0,0,0,.4);
-  transition: transform .18s ease, filter .18s ease;
-}
-.pass:hover{ transform: translateY(-2px); filter: brightness(1.04); }
-.pass.cyan{    background:linear-gradient(180deg,#e6fbff,#c9f5ff); }
-.pass.amber{   background:linear-gradient(180deg,#dff7ff,#bfeeff); color:#002233; }
-.pass.violet{  background:linear-gradient(180deg,#efe9ff,#ddccff); }
-.pass.mint{    background:linear-gradient(180deg,#e8fff7,#caffee); }
-
 /* Photos — grid + lightbox */
 .card.photos .inside{
   position:absolute; inset:16px; border-radius:14px;
@@ -268,7 +298,7 @@ body{
   cursor:pointer;
 }
 .lightbox{
-  position:fixed; inset:0; z-index:9999; display:none;
+  position:fixed; inset:0; z-index:1; display:none;
   background: rgba(1,6,12,.85);
   backdrop-filter: blur(2px) saturate(110%);
 }
@@ -294,17 +324,28 @@ body{
   background: rgba(0,0,0,.65);
 }
 
-/* ===== STREAM card (compact/snug) ===== */
+/* ===== STREAM card ===== */
+
 .card.stream{
   min-height:auto;            /* dynamic height based on content */
   padding-block: 18px;
+  z-index: 5
 }
+
 .card.stream .inside{
   position:static;            /* let content size the card */
-  inset:auto; border-radius:12px;
-  display:flex; align-items:center; justify-content:center;
+  inset:auto; 
+  border-radius:12px;
+  display:flex; 
+  align-items:center; 
+  justify-content:center;
 }
+
 .stream-cta{
+  position:relative; 
+  z-index: 20; 
+  transform: 
+  translateZ(0);
   appearance:none; border:1px solid var(--glass-line);
   background: linear-gradient(180deg, rgba(8,14,24,.9), rgba(10,16,28,.85));
   color:#e2f7ff; font-weight:800; letter-spacing:.14em; text-transform:uppercase;
@@ -313,9 +354,13 @@ body{
   box-shadow: 0 10px 28px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.08);
   animation: btnFlicker 4s infinite;
 }
-.stream-cta:focus-visible{ outline:2px solid #00e6ff; outline-offset:3px; }
+
+.stream-cta:focus-visible{ 
+  outline:2px solid #00e6ff; outline-offset:3px; 
+}
 
 /* Neon flicker for button */
+
 @keyframes btnFlicker {
   0%, 18%, 22%, 25%, 53%, 57%, 100% {
     color: #00eaff;
@@ -413,9 +458,11 @@ body{
 footer{ text-align:center; color:var(--muted); padding:56px 0 80px; }
 
 @media (max-width:980px){
+  :root{ --tilt: 12deg; --depth: 600px; }  /* optional, softer angle */
   .cards{ grid-template-columns:1fr; }
   .card{ min-height:360px; }
-  .card.left,.card.right{ transform:none; }
+  .card.stream{ min-height:auto; }         /* so STREAM hugs its button */
+  /* (intentionally no transform:none here) */
 }
 </style>
 </head>
@@ -461,7 +508,7 @@ footer{ text-align:center; color:var(--muted); padding:56px 0 80px; }
     <article class="card stream left">
       <div class="inside">
         <button id="open-stream" class="stream-cta" aria-haspopup="dialog" aria-controls="stream-modal">
-          STREAM
+          STREAM 'INTO PIECES'
         </button>
       </div>
     </article>
@@ -648,7 +695,7 @@ function parseLocalDate(iso){
   if (!lines.length) return;
 
   lines = lines.sort(()=>Math.random()-0.5);
-  const take = Math.min(lines.length, 13);
+  const take = Math.min(lines.length, 19);
   const STAGGER = 2.2;
   for (let i=0;i<take;i++){
     const d = document.createElement('div');
