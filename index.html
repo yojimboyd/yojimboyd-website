@@ -5,12 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>James Boyd — Terminal</title>
 
-<!-- Fonts -->
+<!-- ==========================
+= SECTION: FONTS & BASE THEME =
+=========================== -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
+/* ===============================
+= SECTION: CSS VARIABLES & RESET =
+================================*/
 :root{
   --vp-x: 50vw;
   --vp-y: 48vh;
@@ -31,8 +36,10 @@
   --sign-amber:#00c6ff;
   --white:#e2f7ff;
   --muted:#7da3c7;
+
   --glass-line: rgba(0, 200, 255, .22);
-  
+
+  /* control lyric vertical position */
   --lyrics-top: 60%;
 }
 
@@ -48,8 +55,9 @@ body{
   overflow-x:hidden;
 }
 
-/* ===== Ambient ===== */
-
+/* ===========================
+= SECTION: AMBIENT BACKDROPS =
+=========================== */
 /* People shadows drifting across fogged glass (3 layers) */
 .shadow-stream{
   position:fixed; inset:-8vh -15vw; z-index:0; pointer-events:none;
@@ -98,7 +106,7 @@ body{
     radial-gradient(64vh 30vh at 72% 78%,  #ffd48024 0%, transparent 62%),
     radial-gradient(52vh 24vh at 35% 28%,  #ffc86a1e 0%, transparent 62%);
   filter: blur(14px) saturate(135%);
-  animation: fog-drift 3s ease-in-out infinite alternate, fog-parallax 48s linear infinite;
+  animation: fog-drift 32s ease-in-out infinite alternate, fog-parallax 48s linear infinite;
 }
 @keyframes fog-drift{ 0%{transform:translate3d(-3vw,.5vh,0)} 100%{transform:translate3d(3vw,-.5vh,0)} }
 @keyframes fog-parallax{ 0%{opacity:.38} 50%{opacity:.52} 100%{opacity:.38} }
@@ -118,7 +126,9 @@ body{
 }
 @keyframes smear-shift{ 0%{background-position:0 0,0 0,0 0} 100%{background-position:-4vw 0,-2vw 0,2vw 0} }
 
-/* ===== Layout ===== */
+/* ===================
+= SECTION: LAYOUT/UI =
+=================== */
 .scene{
   position:relative; z-index:2; min-height:100svh;
   perspective: var(--persp);
@@ -166,7 +176,7 @@ body{
   /* keep lyric + stream-cta animations running */
 }
 
-/* ===== Lyric board ===== */
+/* Lyric board */
 .lyric-board{
   position:fixed; left:50%; top:var(--lyrics-top);
   transform:translate(-50%,-50%); z-index:2; pointer-events:none;
@@ -203,6 +213,7 @@ body{
   100%{opacity:0; transform:translateY(-10px)}
 }
 
+/* Cards grid */
 .cards{
   position:relative; z-index:4;
   display:grid; 
@@ -222,48 +233,19 @@ body{
   border:1px solid var(--glass-line);
   box-shadow: 0 46px 110px rgba(0,0,0,.65), inset 0 2px 0 rgba(255,255,255,.07);
 }
-
-.card.stream { 
-  z-index: 5; 
-}
+.card.stream { z-index: 5; }
 
 .card.left{
   transform-origin: right center;
-  transform: rotateY(var(--tilt))
-  translateZ(calc(var(--depth)*-1))
-  translateX(calc(-1 * var(--skew-offset)));
+  transform: rotateY(var(--tilt)) translateZ(calc(var(--depth)*-1)) translateX(calc(-1 * var(--skew-offset)));
 }
-
 .card.right{
   transform-origin: left center;
-  transform: rotateY(calc(var(--tilt)*-1))
-  translateZ(calc(var(--depth)*-1))
-  translateX(var(--skew-offset));
+  transform: rotateY(calc(var(--tilt)*-1)) translateZ(calc(var(--depth)*-1)) translateX(var(--skew-offset));
 }
 
-.card .inside{ 
-  position:absolute; 
-  inset:16px; 
-  border-radius:14px; 
-}
-
-.card.video  { 
-  z-index: 1; 
-}
-
-.card.video iframe{ 
-  position:absolute; 
-  z-index: 1;
-  inset:0; 
-  width:100%; 
-  height:100%; 
-  border:0; 
-  pointer-events: auto;
-}
-
-.card.stream{ 
-  z-index: 5; 
-}
+.card .inside{ position:absolute; inset:16px; border-radius:14px; }
+.card.video iframe{ position:absolute; z-index:1; inset:0; width:100%; height:100%; border:0; pointer-events:auto; }
 
 /* Dates */
 .dates-list{ list-style:none; padding:0; margin:0; }
@@ -276,74 +258,132 @@ body{
 .dates-list strong{ color:#eaf2ff; }
 .dates-list span{ color:var(--muted); }
 .dates-list strong small{ font-weight:400; color:var(--muted); margin-left:6px; font-size:.95em; }
-.dates-list li.past strong,
-.dates-list li.past span{
+.dates-list li.past strong, .dates-list li.past span{
   color: var(--muted); opacity:.85;
   text-decoration: line-through;
   text-decoration-color: var(--sign-amber);
-  text-decoration-thickness: 2px;
+    text-decoration-thickness: 2px;
   text-decoration-skip-ink: auto;
 }
 
-/* Photos — grid + lightbox */
-.card.photos .inside{
-  position:absolute; inset:16px; border-radius:14px;
-  display:grid; grid-template-columns:repeat(2,1fr); gap:12px;
+/* =======================
+= SECTION: BIO / ABOUT UI=
+======================= */
+.card.about .inside{
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  gap: 14px;
+  align-content: start;
+  padding: 20px;
 }
-.card.photos img{
-  width:100%; height:180px; object-fit:cover;
-  border-radius:10px; opacity:.95; filter:saturate(1.05) contrast(1.03);
-  cursor:pointer;
+.about-title{
+  font-family:"Barlow Condensed",system-ui,sans-serif;
+  font-weight:900; letter-spacing:.12em; text-transform:uppercase;
+  font-size: clamp(20px, 3.2vw, 32px);
+  color:#d7f3ff; text-align:center;
+  text-shadow: 0 0 12px rgba(120,210,255,.35);
+  margin: 0;
+  position: relative;
 }
-.lightbox{
-  position:fixed; inset:0; z-index:1; display:none;
-  background: rgba(1,6,12,.85);
-  backdrop-filter: blur(2px) saturate(110%);
+.about-title::after{
+  content:""; display:block; height:2px; margin:8px auto 0;
+  width:140px; max-width:60%;
+  background: linear-gradient(90deg, transparent, #00d8ff80 25%, transparent 75%, #00d8ff60 90%, transparent);
+  filter: blur(.4px); opacity:.75;
 }
-.lightbox.open{ display:flex; align-items:center; justify-content:center; }
-.lightbox img{
-  max-width: min(92vw, 1400px);
-  max-height: 86vh;
-  width:auto; height:auto; object-fit:contain;
-  box-shadow: 0 40px 120px rgba(0,0,0,.75);
-  border:1px solid rgba(255,255,255,.18);
-  border-radius:12px;
-}
-.lb-close, .lb-prev, .lb-next{
-  position:fixed; top:50%; transform:translateY(-50%);
-  background: rgba(0,0,0,.45); color:#e2f7ff; border:1px solid rgba(255,255,255,.2);
-  padding:10px 14px; border-radius:10px; cursor:pointer; user-select:none;
-  font-size:14px; letter-spacing:.06em;
-}
-.lb-close{ top: 8%; right: 4%; transform:none; }
-.lb-prev { left: 3%; }
-.lb-next { right: 3%; }
-.lb-close:hover, .lb-prev:hover, .lb-next:hover{
-  background: rgba(0,0,0,.65);
-}
+.about-copy{ margin: 0 auto; max-width: 60ch; text-align:center; color:#cfeaff; line-height: 1.4; }
+.about-btn{ animation: btnFlicker 4s infinite; }
 
-/* ===== STREAM card ===== */
+/* Ambient abstract art inside About card */
+.scroll-art{
+  position:absolute; inset:-6%;
+  pointer-events:none; z-index:0;
+  filter: saturate(120%) contrast(105%);
+}
+.scroll-art .ring{
+  position:absolute; inset:auto;
+  width: 120vmin; height: 120vmin; border-radius: 50%;
+  background:
+    radial-gradient(closest-side, rgba(0,230,255,.18), transparent 65%),
+    conic-gradient(from 0deg, rgba(0,198,255,.28), transparent 45%, rgba(0,240,255,.22), transparent 85%);
+  mix-blend-mode: screen;
+  opacity:.35;
+  will-change: transform;
+}
+.scroll-art .ring-a{ top:-30vmin; left:-20vmin; animation: ringA 26s ease-in-out infinite alternate; }
+@keyframes ringA{
+  0%   { transform: translate3d(-3vw,  1vh, 0) rotate(0deg); }
+  50%  { transform: translate3d( 1vw, -1vh, 0) rotate(10deg); }
+  100% { transform: translate3d( 3vw,  1vh, 0) rotate(18deg); }
+}
+.scroll-art .ring-b{ bottom:-40vmin; right:-30vmin; opacity:.28; animation: ringB 32s ease-in-out infinite alternate-reverse; }
+@keyframes ringB{
+  0%   { transform: translate3d( 3vw, -1vh, 0) rotate(0deg); }
+  50%  { transform: translate3d(-1vw,  1vh, 0) rotate(-10deg); }
+  100% { transform: translate3d(-3vw, -1vh, 0) rotate(-18deg); }
+}
+.scroll-art .beam{
+  position:absolute; left:-20%; right:-20%; top:45%; height:22%;
+  background:
+    linear-gradient(180deg, rgba(0,230,255,.16), rgba(0,198,255,.05) 70%, transparent),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.08), rgba(255,255,255,.08) 1px, transparent 1px, transparent 12px);
+  border-top: 1px solid rgba(255,255,255,.15);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  filter: blur(.2px);
+  mix-blend-mode: screen;
+  will-change: transform, opacity;
+  animation: beamSweep 18s ease-in-out infinite;
+}
+@keyframes beamSweep{
+  0%   { transform: translateY(-6px) skewX(-8deg); opacity:.85; }
+  50%  { transform: translateY( 6px) skewX(-8deg); opacity:.6; }
+  100% { transform: translateY(-6px) skewX(-8deg); opacity:.85; }
+}
+.scroll-art .dust{
+  position:absolute; inset:0;
+  background:
+    radial-gradient(1px 1px at 20% 30%, rgba(200,240,255,.25) 50%, transparent 52%),
+    radial-gradient(1px 1px at 62% 70%, rgba(200,240,255,.2) 50%, transparent 52%),
+    radial-gradient(1px 1px at 84% 24%, rgba(255,220,150,.18) 50%, transparent 52%),
+    radial-gradient(1px 1px at 34% 82%, rgba(200,240,255,.2) 50%, transparent 52%);
+  background-repeat: no-repeat;
+  opacity:.7;
+  will-change: transform;
+  animation: dustDrift 40s linear infinite;
+}
+@keyframes dustDrift{
+  0%   { transform: translate3d(-2vw,  1vh, 0); }
+  50%  { transform: translate3d( 2vw, -1vh, 0); }
+  100% { transform: translate3d(-2vw,  1vh, 0); }
+}
+.card.about .inside > *:not(.scroll-art){ position:relative; z-index:1; }
 
+/* ======================
+= SECTION: STREAM PANEL =
+====================== */
 .card.stream{
-  min-height:auto;            /* dynamic height based on content */
-  padding-block: 18px;
-  z-index: 5
+  min-height: auto;
+  height: auto;
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-
 .card.stream .inside{
-  position:static;            /* let content size the card */
-  inset:auto; 
+  position:static;
+  inset: auto; 
   border-radius:12px;
   display:flex; 
+  flex-direction: column;
   align-items:center; 
+  gap: 12px; 
   justify-content:center;
 }
-
 .stream-cta{
   position:relative; 
   z-index: 20; 
-  transform: 
-  translateZ(0);
+  transform: translateZ(0);
   appearance:none; border:1px solid var(--glass-line);
   background: linear-gradient(180deg, rgba(8,14,24,.9), rgba(10,16,28,.85));
   color:#e2f7ff; font-weight:800; letter-spacing:.14em; text-transform:uppercase;
@@ -353,12 +393,13 @@ body{
   animation: btnFlicker 4s infinite;
   pointer-events: auto;
 }
+/* Out-of-phase flicker for each button */
+#open-stream { animation-delay: 0s; }
+.donation-btn { animation-delay: 1s; }
+.tiktok-btn   { animation-delay: 2s; }
+.insta-btn    { animation-delay: 3s; }
 
-.stream-cta:focus-visible{ 
-  outline:2px solid #00e6ff; outline-offset:3px; 
-}
-
-/* Neon flicker for button */
+.stream-cta:focus-visible{ outline:2px solid #00e6ff; outline-offset:3px; }
 
 @keyframes btnFlicker {
   0%, 18%, 22%, 25%, 53%, 57%, 100% {
@@ -378,7 +419,7 @@ body{
   }
 }
 
-/* STREAM modal */
+/* Stream modal */
 .stream-modal{
   position:fixed; inset:0; z-index:10050; display:none;
   align-items:center; justify-content:center;
@@ -442,9 +483,7 @@ body{
 .stream-link.violet { background:linear-gradient(180deg,#efe9ff,#ddccff); }
 .stream-link.mint   { background:linear-gradient(180deg,#e8fff7,#caffee); }
 
-.stream-actions{
-  margin-top:16px; display:flex; justify-content:center; gap:12px; flex-wrap:wrap;
-}
+.stream-actions{ margin-top:16px; display:flex; justify-content:center; gap:12px; flex-wrap:wrap; }
 .btn-ghost{
   appearance:none; cursor:pointer;
   border-radius:10px; border:1px solid rgba(255,255,255,.18);
@@ -456,22 +495,30 @@ body{
 /* Footer */
 footer{ text-align:center; color:var(--muted); padding:56px 0 80px; }
 
+/* =====================
+= SECTION: RESPONSIVE  =
+===================== */
 @media (max-width:980px){
-  :root{ --tilt: 12deg; --depth: 600px; }  /* optional, softer angle */
   .cards{ grid-template-columns:1fr; }
   .card{ min-height:360px; }
-  .card.stream{ min-height:auto; }         /* so STREAM hugs its button */
-  /* (intentionally no transform:none here) */
+  .card.stream{ min-height:auto; }
+  /* Reset tilt/skew on mobile */
+  .card.left, .card.right { transform: none !important; }
 }
 </style>
 </head>
 <body>
 
-<!-- Ambient layers -->
+<!-- =============================
+= SECTION: AMBIENT LAYER MOUNTS  =
+============================== -->
 <div class="shadow-stream" aria-hidden="true"></div>
 <div class="fog" aria-hidden="true"></div>
 <div class="glass-smear" aria-hidden="true"></div>
 
+<!-- =================
+= SECTION: CONTENT  =
+================= -->
 <div class="scene">
   <!-- Title -->
   <div class="header">
@@ -485,7 +532,8 @@ footer{ text-align:center; color:var(--muted); padding:56px 0 80px; }
 
   <!-- Cards -->
   <div class="cards" id="cards">
-    <!-- Video -->
+
+    <!-- ===== CARD: VIDEO ===== -->
     <article class="card video left">
       <div class="inside">
         <iframe
@@ -496,37 +544,54 @@ footer{ text-align:center; color:var(--muted); padding:56px 0 80px; }
       </div>
     </article>
 
-    <!-- Dates -->
+    <!-- ===== CARD: DATES ===== -->
     <article class="card dates right">
       <div class="inside">
         <ul class="dates-list" id="dates-list"></ul>
       </div>
     </article>
 
-    <!-- STREAM (snug) -->
+    <!-- ===== CARD: STREAM + LINKS ===== -->
     <article class="card stream left">
       <div class="inside">
         <button id="open-stream" class="stream-cta" aria-haspopup="dialog" aria-controls="stream-modal">
           STREAM 'INTO PIECES'
         </button>
+        <a href="https://www.paypal.com/donate/?hosted_button_id=3WC6SA2FU9JRA" target="_blank" rel="noopener" class="stream-cta donation-btn">SUPPORT</a>
+        <a href="https://www.tiktok.com/@yojimboyd" target="_blank" rel="noopener" class="stream-cta tiktok-btn">TIKTOK</a>
+        <a href="https://www.instagram.com/yojimboyd/" target="_blank" rel="noopener" class="stream-cta insta-btn">INSTAGRAM</a>
       </div>
     </article>
 
-    <!-- Photos (gallery) -->
-    <article class="card photos right">
+    <!-- ===== CARD: ABOUT / BIO ===== -->
+    <article class="card about right">
       <div class="inside">
-        <img src="images/jamesChair.jpg"   alt="James on chair"       data-full="images/jamesChair.jpg">
-        <img src="images/jamesEye.png"     alt="James London Eye"     data-full="images/jamesEye.png">
-        <img src="images/jamesNoGuitar.jpg" alt="James No Guitar"     data-full="images/jamesNoGuitar.jpg">
-        <img src="images/jamesSunset.jpg"  alt="James Sunset"         data-full="images/jamesSunset.jpg">
+        <div class="scroll-art" aria-hidden="true">
+          <span class="ring ring-a"></span>
+          <span class="ring ring-b"></span>
+          <span class="beam"></span>
+          <span class="dust"></span>
+        </div>
+
+        <h3 class="about-title">About James Boyd</h3>
+        <p class="about-copy">
+          London singer–songwriter weaving indie textures with heartfelt lyrics.
+          Live sets that feel intimate yet electric; songs about late nights,
+          city lights, and finding your people.
+        </p>
+
+        <a href="about.html" class="stream-cta about-btn">Read More</a>
       </div>
     </article>
+
   </div>
 </div>
 
 <footer>© <span id="year"></span> James Boyd</footer>
 
-<!-- ===== Dates data ===== -->
+<!-- =====================
+= SECTION: DATES (DATA)  =
+====================== -->
 <script id="dates-data" type="application/json">
 [
   { "date":"2025-06-27", "time":"19:00", "city":"The Old Frizzle, Wimbledon" },
@@ -544,7 +609,9 @@ footer{ text-align:center; color:var(--muted); padding:56px 0 80px; }
 ]
 </script>
 
-<!-- ===== Lyrics data (kept, as requested) ===== -->
+<!-- ======================
+= SECTION: LYRICS (DATA)  =
+======================= -->
 <script id="lyrics-data" type="application/json">
 [
   "faces through the trees",
@@ -640,6 +707,9 @@ footer{ text-align:center; color:var(--muted); padding:56px 0 80px; }
 ]
 </script>
 
+<!-- ==========================
+= SECTION: PAGE INTERACTIONS  =
+=========================== -->
 <script>
 /* Footer year */
 document.getElementById('year').textContent = new Date().getFullYear();
@@ -683,7 +753,7 @@ function parseLocalDate(iso){
   }).join('');
 })();
 
-/* Build the lyric board — 13 lines with smoke trails and staggered starts */
+/* Build the lyric board — staggered smoke lines */
 (() => {
   const mount = document.getElementById('lyric-board');
   const raw = document.getElementById('lyrics-data');
@@ -707,86 +777,6 @@ function parseLocalDate(iso){
   }
 })();
 
-/* Lightbox gallery for Photos */
-(() => {
-  const thumbs = Array.from(document.querySelectorAll('.card.photos img'));
-  if (!thumbs.length) return;
-
-  const lb = document.createElement('div');
-  lb.className = 'lightbox';
-  lb.innerHTML = `
-    <button class="lb-close" aria-label="Close">Close ✕</button>
-    <button class="lb-prev"  aria-label="Previous">‹ Prev</button>
-    <img alt="">
-    <button class="lb-next"  aria-label="Next">Next ›</button>
-  `;
-  document.body.appendChild(lb);
-
-  const img = lb.querySelector('img');
-  const btnClose = lb.querySelector('.lb-close');
-  const btnPrev  = lb.querySelector('.lb-prev');
-  const btnNext  = lb.querySelector('.lb-next');
-
-  let idx = 0;
-
-  function open(i){
-    idx = i;
-    const src = thumbs[idx].dataset.full || thumbs[idx].src;
-    img.src = src;
-    img.alt = thumbs[idx].alt || '';
-    lb.classList.add('open');
-  }
-  function close(){ lb.classList.remove('open'); img.src = ''; }
-  function prev(){ open((idx - 1 + thumbs.length) % thumbs.length); }
-  function next(){ open((idx + 1) % thumbs.length); }
-
-  thumbs.forEach((t,i)=> t.addEventListener('click', ()=> open(i)));
-  btnClose.addEventListener('click', close);
-  btnPrev.addEventListener('click', prev);
-  btnNext.addEventListener('click', next);
-  lb.addEventListener('click', (e)=> { if(e.target === lb) close(); });
-  window.addEventListener('keydown', (e)=>{
-    if(!lb.classList.contains('open')) return;
-    if(e.key === 'Escape') close();
-    if(e.key === 'ArrowLeft') prev();
-    if(e.key === 'ArrowRight') next();
-  });
-})();
-</script>
-
-<!-- STREAM modal markup -->
-<div class="stream-modal" id="stream-modal" role="dialog" aria-modal="true" aria-labelledby="stream-title" aria-hidden="true">
-  <div class="stream-panel">
-    <h2 id="stream-title" class="stream-title">Stream “Into Pieces”</h2>
-
-    <div class="stream-grid" id="stream-grid">
-      <a class="stream-link cyan"   href="https://open.spotify.com/album/0a3edtdtT85aYlUaVcSBta?si=54cuabmkRwi3AV9nAxSvEQ" target="_blank" rel="noopener">
-        <span>Spotify</span>
-      </a>
-      <a class="stream-link amber"  href="https://music.apple.com/ua/album/into-pieces-ep/1799751367" target="_blank" rel="noopener">
-        <span>Apple Music</span>
-      </a>
-      <a class="stream-link violet" href="https://www.amazon.com/Into-Pieces-James-Boyd/dp/B0DZ1DF8BY" target="_blank" rel="noopener">
-        <span>Amazon Music</span>
-      </a>
-      <a class="stream-link mint"   href="#" target="_blank" rel="noopener">
-        <span>TIDAL</span> <small>(coming soon)</small>
-      </a>
-      <a class="stream-link cyan"   href="https://music.youtube.com/search?q=James%20Boyd%20Into%20Pieces" target="_blank" rel="noopener">
-        <span>YouTube Music</span>
-      </a>
-      <a class="stream-link amber"  href="https://soundcloud.com/search?q=James%20Boyd%20Into%20Pieces" target="_blank" rel="noopener">
-        <span>SoundCloud</span>
-      </a>
-    </div>
-
-    <div class="stream-actions">
-      <button class="btn-ghost" id="close-stream">Close</button>
-    </div>
-  </div>
-</div>
-
-<script>
 /* STREAM modal JS */
 (() => {
   const openBtn = document.getElementById('open-stream');
@@ -816,7 +806,28 @@ function parseLocalDate(iso){
   window.addEventListener('keydown', (e)=>{ if (modal.classList.contains('open') && e.key === 'Escape') closeModal(); });
 })();
 </script>
+
+<!-- =====================
+= SECTION: STREAM MODAL =
+===================== -->
+<div class="stream-modal" id="stream-modal" role="dialog" aria-modal="true" aria-labelledby="stream-title" aria-hidden="true">
+  <div class="stream-panel">
+    <h2 id="stream-title" class="stream-title">Stream “Into Pieces”</h2>
+
+    <div class="stream-grid" id="stream-grid">
+      <a class="stream-link cyan"   href="https://open.spotify.com/album/0a3edtdtT85aYlUaVcSBta?si=54cuabmkRwi3AV9nAxSvEQ" target="_blank" rel="noopener"><span>Spotify</span></a>
+      <a class="stream-link amber"  href="https://music.apple.com/ua/album/into-pieces-ep/1799751367" target="_blank" rel="noopener"><span>Apple Music</span></a>
+      <a class="stream-link violet" href="https://www.amazon.com/Into-Pieces-James-Boyd/dp/B0DZ1DF8BY" target="_blank" rel="noopener"><span>Amazon Music</span></a>
+      <a class="stream-link mint"   href="#" target="_blank" rel="noopener"><span>TIDAL</span> <small>(coming soon)</small></a>
+      <a class="stream-link cyan"   href="https://music.youtube.com/search?q=James%20Boyd%20Into%20Pieces" target="_blank" rel="noopener"><span>YouTube Music</span></a>
+      <a class="stream-link amber"  href="https://soundcloud.com/search?q=James%20Boyd%20Into%20Pieces" target="_blank" rel="noopener"><span>SoundCloud</span></a>
+    </div>
+
+    <div class="stream-actions">
+      <button class="btn-ghost" id="close-stream">Close</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
-
-
