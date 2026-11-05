@@ -1,833 +1,212 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>James Boyd — Terminal</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- ==========================
-= SECTION: FONTS & BASE THEME =
-=========================== -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>yojimboyd | photos</title>
 
-<style>
-/* ===============================
-= SECTION: CSS VARIABLES & RESET =
-================================*/
-:root{
-  --vp-x: 50vw;
-  --vp-y: 48vh;
-  --persp: 2000px;
-  --tilt: 15deg;
-  --depth: 400px;
-  --skew-offset: clamp(8px, .9vw, 18px);
-  --nudge-x: 0vw;
-  --gap: 17rem;
-  --skew-x: 2.8vw;
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Bitcount+Single:wght@100..900&display=swap" rel="stylesheet">
+    
+	<style>
+        * {
+            box-sizing: border-box;
+        }
 
-  --tarmac:#020c1b;
-  --terminal:#04142e;
-  --sodium:#0a254d;
-  --line:#123567;
+        body {
+			max-width: 1200px;
+            margin: 0 auto;
+			padding-top: 100px;
+            padding: 100px;
+            font-family: Arial, sans-serif;
+			background-color: #F1F1F1;
+		}
 
-  --sign-yellow:#00faff;
-  --sign-amber:#00c6ff;
-  --white:#e2f7ff;
-  --muted:#7da3c7;
+        h1 {
+	    font-size: 15px;
+            font-family: "Bitcount Single", serif;
+            font-weight: 400;
+            margin: 0 0 30px;
+			margin-bottom: 80px;
+			text-align: center;
+			color: #464646;
+			font-size: clamp(1rem, 4vw, 2rem); 
+			letter-spacing: 1em
+			
+        }
 
-  --glass-line: rgba(0, 200, 255, .22);
+        .gallery {
+            display: grid;
+            gap: 5em;
+            margin-bottom: 5em;
+        }
 
-  /* control lyric vertical position */
-  --lyrics-top: 60%;
-}
+        .three {
+            grid-template-columns: repeat(3, 1fr);
+        }
 
-*{ box-sizing:border-box; }
-html,body{ height:100%; }
-body{
-  margin:0; color:var(--white);
-  font-family:"Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  background:
-    radial-gradient(80vh 60vh at 50% 10%, #111a33 0%, transparent 60%),
-    radial-gradient(100vh 50vh at 50% 100%, #0b1220 0%, transparent 60%),
-    linear-gradient(var(--tarmac), var(--terminal) 40%, #070b12 100%);
-  overflow-x:hidden;
-}
+        .two {
+            grid-template-columns: repeat(2, 1fr);
+        }
 
-/* ===========================
-= SECTION: AMBIENT BACKDROPS =
-=========================== */
-/* People shadows drifting across fogged glass (3 layers) */
-.shadow-stream{
-  position:fixed; inset:-8vh -15vw; z-index:0; pointer-events:none;
-  background:
-    radial-gradient(40vmin 12vmin at -20% 70%, #000a 45%, transparent 75%),
-    radial-gradient(36vmin 10vmin at 110% 65%, #0009 40%, transparent 72%),
-    radial-gradient(34vmin 10vmin at 30% 95%,  #0008 35%, transparent 70%),
-    radial-gradient(32vmin 10vmin at 70% 92%,  #0008 35%, transparent 70%);
-  mix-blend-mode:multiply;
-  filter: blur(3px) contrast(1.15);
-  animation: walk-left 28s linear infinite, sway 8s ease-in-out infinite alternate;
-}
-.shadow-stream::before{
-  content:""; position:absolute; inset:-6vh -12vw;
-  background:
-    radial-gradient(44vmin 13vmin at -10% 75%, #000c 50%, transparent 76%),
-    radial-gradient(38vmin 11vmin at 120% 60%, #000b 45%, transparent 72%),
-    radial-gradient(34vmin 11vmin at 20% 90%,  #000a 40%, transparent 72%),
-    radial-gradient(32vmin 11vmin at 78% 94%,  #000a 40%, transparent 72%);
-  mix-blend-mode:multiply;
-  filter: blur(3.5px) contrast(1.2);
-  animation: walk-right 22s linear infinite, sway 7s ease-in-out infinite alternate-reverse, pulse-blur 12s ease-in-out infinite;
-}
-.shadow-stream::after{
-  content:""; position:absolute; inset:-5vh -10vw;
-  background:
-    radial-gradient(46vmin 14vmin at -15% 78%, #000d 55%, transparent 78%),
-    radial-gradient(40vmin 12vmin at 115% 62%, #000c 50%, transparent 74%),
-    radial-gradient(36vmin 12vmin at 18% 96%,  #000b 45%, transparent 74%),
-    radial-gradient(34vmin 12vmin at 82% 96%,  #000b 45%, transparent 74%);
-  mix-blend-mode:multiply;
-  filter: blur(4px) contrast(1.25);
-  animation: walk-left 16s linear infinite, sway 6s ease-in-out infinite, pulse-blur 10s ease-in-out infinite reverse;
-}
-@keyframes walk-left{  0%{transform:translateX(40vw)} 100%{transform:translateX(-40vw)} }
-@keyframes walk-right{ 0%{transform:translateX(-46vw)} 100%{transform:translateX(46vw)} }
-@keyframes sway{ 0%{transform:translateY(0) scale(1)} 100%{transform:translateY(-1.2vh) scale(1.02)} }
-@keyframes pulse-blur{ 0%,100%{filter:blur(3px) contrast(1.15)} 50%{filter:blur(5px) contrast(1.1)} }
+        img {
+            display: block;
+            width: 100%;
+            height: auto;
+			border-radius: 5px;
+			cursor: pointer;
+        }
 
-/* Fog + stronger glass */
-.fog{
-  position:fixed; inset:-12vh -10vw; z-index:1; pointer-events:none;
-  background:
-    radial-gradient(70vh 34vh at 28% 72%,  #9db8ff26 0%, transparent 60%),
-    radial-gradient(60vh 28vh at 70% 34%,  #9db8ff1f 0%, transparent 60%),
-    radial-gradient(64vh 30vh at 72% 78%,  #ffd48024 0%, transparent 62%),
-    radial-gradient(52vh 24vh at 35% 28%,  #ffc86a1e 0%, transparent 62%);
-  filter: blur(14px) saturate(135%);
-  animation: fog-drift 32s ease-in-out infinite alternate, fog-parallax 48s linear infinite;
-}
-@keyframes fog-drift{ 0%{transform:translate3d(-3vw,.5vh,0)} 100%{transform:translate3d(3vw,-.5vh,0)} }
-@keyframes fog-parallax{ 0%{opacity:.38} 50%{opacity:.52} 100%{opacity:.38} }
+        .email {
+			font-family: "Bitcount Single", serif;
+			font-style: Italic;
+            display: block;
+            margin-top: 35px;
+            color: inherit;
+            text-decoration: none;
+            font-size: 14px;
+			text-align: center;
+			color: #464646;
+        }
+		
+		.lightbox {
+			display: none;
+			position: fixed;
+			z-index: 1000;
+			inset: 0;
+			background: rgba(245, 243, 238, 0.65);
+			justify-content: center;
+			align-items: center;
+			padding: 40px;
+			backdrop-filter: blur(15px) brightness(1.15);
+			-webkit-backdrop-filter: blur(15px) brightness(1.15);
+		}
 
-.glass-smear{
-  position:fixed; inset:0; z-index:1; pointer-events:none;
-  background:
-    linear-gradient(90deg, rgba(255,255,255,.03) 0 1px, transparent 1px 12px),
-    radial-gradient(120% 120% at 50% 50%, transparent 55%, rgba(0,0,0,.25) 100%),
-    radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,.08) 48%, transparent 52%),
-    radial-gradient(1px 1px at 60% 70%, rgba(255,255,255,.07) 48%, transparent 52%);
-  background-size:100% 100%,100% 100%,220px 220px,260px 260px;
-  mix-blend-mode: soft-light;
-  opacity:.22;
-  animation: smear-shift 24s linear infinite;
-  backdrop-filter: blur(2.5px) saturate(112%);
-}
-@keyframes smear-shift{ 0%{background-position:0 0,0 0,0 0} 100%{background-position:-4vw 0,-2vw 0,2vw 0} }
+		/* Enlarged photograph */
+		.lightbox img {
+			max-width: 90%;
+			max-height: 85vh;
+			width: auto;
+			height: auto;
+			object-fit: contain;
+			border-radius: 4px;
+			cursor: default;
+		}
 
-/* ===================
-= SECTION: LAYOUT/UI =
-=================== */
-.scene{
-  position:relative; z-index:2; min-height:100svh;
-  perspective: var(--persp);
-  perspective-origin: var(--vp-x) var(--vp-y);
-}
+		/* Close button */
+		.lightbox .close {
+			position: absolute;
+			top: 25px;
+			right: 35px;
+			color: #464646;
+			font-size: 35px;
+			font-family: Arial, sans-serif;
+			font-weight: 200;
+			cursor: pointer;
+			background: none;
+			border: none;
+		}
 
-/* Title (SVG with neon flicker) */
-.header{
-  position:relative; z-index:3;
-  display:grid; place-items:center; margin: clamp(12px, 4vh, 28px) 0;
-}
-.wordmark{ display:none!important; }
-.wordmark-wrap{ position:relative; display:inline-block; line-height:0; z-index:3; }
-.title-svg{
-  width:clamp(260px, 38vw, 920px);
-  height:auto; display:block;
-  filter:
-    drop-shadow(0 0 10px rgba(0,230,255,.35))
-    drop-shadow(0 0 28px rgba(0,198,255,.22));
-  animation: titleFlicker 7s infinite steps(1,end);
-}
-.wordmark-wrap{ animation: titleJitter 7s infinite steps(1,end); }
-@keyframes titleFlicker{
-  0%,6%,9%,14%,20%,38%,42%,55%,62%,74%,86%,92%,100%{
-    opacity:1;
-    filter: drop-shadow(0 0 12px rgba(0,230,255,.55)) drop-shadow(0 0 36px rgba(0,198,255,.35)) drop-shadow(0 0 72px rgba(0,198,255,.25));
-  }
-  7%,15%,39%,56%{ opacity:.55; filter:none; }
-  24%,63%,88%   { opacity:.25; filter:none; }
-}
-@keyframes titleJitter{
-  0%,100%{ transform:translate(0,0) }
-  7% { transform:translate(0.2px, 0.1px) }
-  15%{ transform:translate(-0.3px, 0.1px) }
-  24%{ transform:translate(0.1px,-0.2px) }
-  39%{ transform:translate(-0.2px,0.2px) }
-  56%{ transform:translate(0.2px,-0.1px) }
-  63%{ transform:translate(-0.1px,0.2px) }
-  88%{ transform:translate(0.1px,-0.1px) }
-}
-@media (prefers-reduced-motion: reduce){
-  .title-svg,.wordmark-wrap{ animation:none!important; }
-  .shadow-stream, .shadow-stream::before, .shadow-stream::after,
-  .fog, .glass-smear { animation: none !important; }
-  /* keep lyric + stream-cta animations running */
-}
+        @media (max-width: 600px) {
+            body {
+                padding: 20px;
+            }
 
-/* Lyric board */
-.lyric-board{
-  position:fixed; left:50%; top:var(--lyrics-top);
-  transform:translate(-50%,-50%); z-index:2; pointer-events:none;
-  text-align:center; width:min(92vw,1200px);
-  line-height:1.1; opacity:.18; filter:blur(.1px);
-}
-.lyric-board .line{
-  font-family:"Barlow Condensed",system-ui,sans-serif; font-weight:800;
-  letter-spacing:.08em; text-transform:uppercase; color:#d7f3ff;
-  font-size:clamp(16px,2.2vw,30px);
-  opacity:0; animation: lyricFade 16s infinite;
-  position:relative; isolation:isolate; mix-blend-mode:screen;
-  text-shadow: 0 0 18px rgba(210,240,255,.35), 0 0 42px rgba(120,210,255,.25);
-}
-.lyric-board .line::after{
-  content:attr(data-text); position:absolute; inset:0; color:#d7f3ff;
-  opacity:0; filter: blur(6px) contrast(1.05); transform: translateY(0);
-  pointer-events:none; mix-blend-mode:screen;
-  -webkit-mask: linear-gradient(180deg, rgba(0,0,0,.9), rgba(0,0,0,.35) 60%, transparent);
-          mask: linear-gradient(180deg, rgba(0,0,0,.9), rgba(0,0,0,.35) 60%, transparent);
-  animation: smokeTrail 16s ease-in-out infinite;
-  animation-delay: var(--smoke-delay,0s);
-}
-@keyframes lyricFade{
-  0%,20%{opacity:0; transform:translateY(6px)}
-  30%,60%{opacity:1; transform:translateY(0)}
-  80%,100%{opacity:0; transform:translateY(-6px)}
-}
-@keyframes smokeTrail{
-  0%,24%{opacity:0; transform:translateY(2px)}
-  30%{opacity:.35; transform:translateY(0)}
-  55%{opacity:.22; transform:translateY(-4px)}
-  75%{opacity:.10; transform:translateY(-8px)}
-  100%{opacity:0; transform:translateY(-10px)}
-}
-
-/* Cards grid */
-.cards{
-  position:relative; z-index:4;
-  display:grid; 
-  grid-template-columns:repeat(auto-fit,minmax(420px,1fr));
-  gap:2.2rem; width:min(1500px,92vw);
-  margin: clamp(4px,2vh,16px) auto 0;
-  perspective: var(--persp);
-  perspective-origin: 50% var(--vp-y);
-  transform-style: preserve-3d; 
-  transform: translateX(var(--nudge-x));
-  column-gap: var(--gap);     
-  row-gap: 3rem; 
-}
-.card{
-  position:relative; min-height:430px; border-radius:16px; overflow:hidden;
-  background: linear-gradient(180deg, rgba(6,10,18,.85), rgba(10,16,28,.85));
-  border:1px solid var(--glass-line);
-  box-shadow: 0 46px 110px rgba(0,0,0,.65), inset 0 2px 0 rgba(255,255,255,.07);
-}
-.card.stream { z-index: 5; }
-
-.card.left{
-  transform-origin: right center;
-  transform: rotateY(var(--tilt)) translateZ(calc(var(--depth)*-1)) translateX(calc(-1 * var(--skew-offset)));
-}
-.card.right{
-  transform-origin: left center;
-  transform: rotateY(calc(var(--tilt)*-1)) translateZ(calc(var(--depth)*-1)) translateX(var(--skew-offset));
-}
-
-.card .inside{ position:absolute; inset:16px; border-radius:14px; }
-.card.video iframe{ position:absolute; z-index:1; inset:0; width:100%; height:100%; border:0; pointer-events:auto; }
-
-/* Dates */
-.dates-list{ list-style:none; padding:0; margin:0; }
-.dates-list li{
-  display:flex; justify-content:space-between; align-items:baseline;
-  gap:12px; padding:12px 10px;
-  border-bottom:1px dashed rgba(255,255,255,.18); font-size:1.05rem;
-}
-.dates-list li:last-child{ border-bottom:none; }
-.dates-list strong{ color:#eaf2ff; }
-.dates-list span{ color:var(--muted); }
-.dates-list strong small{ font-weight:400; color:var(--muted); margin-left:6px; font-size:.95em; }
-.dates-list li.past strong, .dates-list li.past span{
-  color: var(--muted); opacity:.85;
-  text-decoration: line-through;
-  text-decoration-color: var(--sign-amber);
-    text-decoration-thickness: 2px;
-  text-decoration-skip-ink: auto;
-}
-
-/* =======================
-= SECTION: BIO / ABOUT UI=
-======================= */
-.card.about .inside{
-  position: relative;
-  overflow: hidden;
-  display: grid;
-  gap: 14px;
-  align-content: start;
-  padding: 20px;
-}
-.about-title{
-  font-family:"Barlow Condensed",system-ui,sans-serif;
-  font-weight:900; letter-spacing:.12em; text-transform:uppercase;
-  font-size: clamp(20px, 3.2vw, 32px);
-  color:#d7f3ff; text-align:center;
-  text-shadow: 0 0 12px rgba(120,210,255,.35);
-  margin: 0;
-  position: relative;
-}
-.about-title::after{
-  content:""; display:block; height:2px; margin:8px auto 0;
-  width:140px; max-width:60%;
-  background: linear-gradient(90deg, transparent, #00d8ff80 25%, transparent 75%, #00d8ff60 90%, transparent);
-  filter: blur(.4px); opacity:.75;
-}
-.about-copy{ margin: 0 auto; max-width: 60ch; text-align:center; color:#cfeaff; line-height: 1.4; }
-.about-btn{ animation: btnFlicker 4s infinite; }
-
-/* Ambient abstract art inside About card */
-.scroll-art{
-  position:absolute; inset:-6%;
-  pointer-events:none; z-index:0;
-  filter: saturate(120%) contrast(105%);
-}
-.scroll-art .ring{
-  position:absolute; inset:auto;
-  width: 120vmin; height: 120vmin; border-radius: 50%;
-  background:
-    radial-gradient(closest-side, rgba(0,230,255,.18), transparent 65%),
-    conic-gradient(from 0deg, rgba(0,198,255,.28), transparent 45%, rgba(0,240,255,.22), transparent 85%);
-  mix-blend-mode: screen;
-  opacity:.35;
-  will-change: transform;
-}
-.scroll-art .ring-a{ top:-30vmin; left:-20vmin; animation: ringA 26s ease-in-out infinite alternate; }
-@keyframes ringA{
-  0%   { transform: translate3d(-3vw,  1vh, 0) rotate(0deg); }
-  50%  { transform: translate3d( 1vw, -1vh, 0) rotate(10deg); }
-  100% { transform: translate3d( 3vw,  1vh, 0) rotate(18deg); }
-}
-.scroll-art .ring-b{ bottom:-40vmin; right:-30vmin; opacity:.28; animation: ringB 32s ease-in-out infinite alternate-reverse; }
-@keyframes ringB{
-  0%   { transform: translate3d( 3vw, -1vh, 0) rotate(0deg); }
-  50%  { transform: translate3d(-1vw,  1vh, 0) rotate(-10deg); }
-  100% { transform: translate3d(-3vw, -1vh, 0) rotate(-18deg); }
-}
-.scroll-art .beam{
-  position:absolute; left:-20%; right:-20%; top:45%; height:22%;
-  background:
-    linear-gradient(180deg, rgba(0,230,255,.16), rgba(0,198,255,.05) 70%, transparent),
-    repeating-linear-gradient(90deg, rgba(255,255,255,.08), rgba(255,255,255,.08) 1px, transparent 1px, transparent 12px);
-  border-top: 1px solid rgba(255,255,255,.15);
-  border-bottom: 1px solid rgba(255,255,255,.08);
-  filter: blur(.2px);
-  mix-blend-mode: screen;
-  will-change: transform, opacity;
-  animation: beamSweep 18s ease-in-out infinite;
-}
-@keyframes beamSweep{
-  0%   { transform: translateY(-6px) skewX(-8deg); opacity:.85; }
-  50%  { transform: translateY( 6px) skewX(-8deg); opacity:.6; }
-  100% { transform: translateY(-6px) skewX(-8deg); opacity:.85; }
-}
-.scroll-art .dust{
-  position:absolute; inset:0;
-  background:
-    radial-gradient(1px 1px at 20% 30%, rgba(200,240,255,.25) 50%, transparent 52%),
-    radial-gradient(1px 1px at 62% 70%, rgba(200,240,255,.2) 50%, transparent 52%),
-    radial-gradient(1px 1px at 84% 24%, rgba(255,220,150,.18) 50%, transparent 52%),
-    radial-gradient(1px 1px at 34% 82%, rgba(200,240,255,.2) 50%, transparent 52%);
-  background-repeat: no-repeat;
-  opacity:.7;
-  will-change: transform;
-  animation: dustDrift 40s linear infinite;
-}
-@keyframes dustDrift{
-  0%   { transform: translate3d(-2vw,  1vh, 0); }
-  50%  { transform: translate3d( 2vw, -1vh, 0); }
-  100% { transform: translate3d(-2vw,  1vh, 0); }
-}
-.card.about .inside > *:not(.scroll-art){ position:relative; z-index:1; }
-
-/* ======================
-= SECTION: STREAM PANEL =
-====================== */
-.card.stream{
-  min-height: auto;
-  height: auto;
-  padding: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.card.stream .inside{
-  position:static;
-  inset: auto; 
-  border-radius:12px;
-  display:flex; 
-  flex-direction: column;
-  align-items:center; 
-  gap: 12px; 
-  justify-content:center;
-}
-.stream-cta{
-  position:relative; 
-  z-index: 20; 
-  transform: translateZ(0);
-  appearance:none; border:1px solid var(--glass-line);
-  background: linear-gradient(180deg, rgba(8,14,24,.9), rgba(10,16,28,.85));
-  color:#e2f7ff; font-weight:800; letter-spacing:.14em; text-transform:uppercase;
-  padding:16px 24px; border-radius:12px; cursor:pointer;
-  text-shadow: 0 0 14px rgba(0,230,255,.25);
-  box-shadow: 0 10px 28px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.08);
-  animation: btnFlicker 4s infinite;
-  pointer-events: auto;
-}
-/* Out-of-phase flicker for each button */
-#open-stream { animation-delay: 0s; }
-.donation-btn { animation-delay: 1s; }
-.tiktok-btn   { animation-delay: 2s; }
-.insta-btn    { animation-delay: 3s; }
-
-.stream-cta:focus-visible{ outline:2px solid #00e6ff; outline-offset:3px; }
-
-@keyframes btnFlicker {
-  0%, 18%, 22%, 25%, 53%, 57%, 100% {
-    color: #00eaff;
-    text-shadow: 0 0 6px #00eaff, 0 0 14px #00eaff, 0 0 28px #00eaff;
-    opacity: 1;
-  }
-  12%, 20%, 24%, 40%, 55%, 80% {
-    color: #7dfbff;
-    text-shadow: 0 0 4px #7dfbff, 0 0 10px #7dfbff;
-    opacity: 0.8;
-  }
-  30%, 65%, 90% {
-    color: #00c6ff;
-    text-shadow: 0 0 5px #00c6ff, 0 0 12px #00c6ff;
-    opacity: 0.92;
-  }
-}
-
-/* Stream modal */
-.stream-modal{
-  position:fixed; inset:0; z-index:10050; display:none;
-  align-items:center; justify-content:center;
-  background: rgba(2, 8, 18, .65);
-  backdrop-filter: blur(3px) saturate(112%);
-}
-.stream-modal.open{ display:flex; }
-.stream-panel{
-  width:min(92vw, 780px);
-  border-radius:16px;
-  background: linear-gradient(180deg, rgba(6,10,18,.94), rgba(10,16,28,.92));
-  border:1px solid rgba(255,255,255,.14);
-  box-shadow: 0 60px 160px rgba(0,0,0,.7), 0 0 80px rgba(0,200,255,.15);
-  padding: clamp(16px, 3.2vw, 28px);
-  transform: translateY(8px);
-  opacity:0;
-  animation: panelIn .7s ease-out forwards;
-}
-@keyframes panelIn{
-  0%  { opacity:0; transform:translateY(10px) }
-  60% { opacity:1; transform:translateY(0) }
-  100%{ opacity:1; transform:translateY(0) }
-}
-.stream-title{
-  margin:0 0 14px 0;
-  font-family:"Barlow Condensed", system-ui, sans-serif;
-  font-weight:900; letter-spacing:.12em; text-transform:uppercase;
-  font-size: clamp(22px, 5.2vw, 44px);
-  color:#d7f3ff;
-  text-align:center;
-  position:relative;
-  text-shadow: 0 0 20px rgba(120,210,255,.28);
-}
-.stream-title::after{
-  content:""; display:block; height:2px; margin:10px auto 0;
-  width:220px; max-width:60%;
-  background: linear-gradient(90deg, transparent, #00d8ff80 25%, transparent 75%, #00d8ff60 90%, transparent);
-  filter: blur(.4px); opacity:.75;
-}
-.stream-grid{
-  display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap:12px;
-  margin-top: 12px;
-}
-.stream-link{
-  display:flex; align-items:center; justify-content:center; gap:10px;
-  text-decoration:none; font-weight:800;
-  color:#0b0f14; background:#fff; border:1px solid #fff;
-  border-radius:12px; padding:14px 14px;
-  box-shadow: 0 10px 28px rgba(0,0,0,.35);
-  transition: transform .18s ease, filter .18s ease;
-  opacity:0; transform: translateY(6px);
-  animation: itemIn .6s ease-out forwards;
-}
-@keyframes itemIn{ to{ opacity:1; transform: translateY(0); } }
-.stream-link:hover{ transform: translateY(-2px); filter: brightness(1.04); }
-.stream-link small{ font-weight:600; color:#234; letter-spacing:.02em; }
-.stream-link.cyan   { background:linear-gradient(180deg,#e6fbff,#c9f5ff); }
-.stream-link.amber  { background:linear-gradient(180deg,#dff7ff,#bfeeff); color:#002233; }
-.stream-link.violet { background:linear-gradient(180deg,#efe9ff,#ddccff); }
-.stream-link.mint   { background:linear-gradient(180deg,#e8fff7,#caffee); }
-
-.stream-actions{ margin-top:16px; display:flex; justify-content:center; gap:12px; flex-wrap:wrap; }
-.btn-ghost{
-  appearance:none; cursor:pointer;
-  border-radius:10px; border:1px solid rgba(255,255,255,.18);
-  background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-  color:#e2f7ff; padding:10px 14px; letter-spacing:.06em;
-}
-.btn-ghost:focus-visible{ outline:2px solid #00e6ff; outline-offset:3px; }
-
-/* Footer */
-footer{ text-align:center; color:var(--muted); padding:56px 0 80px; }
-
-/* =====================
-= SECTION: RESPONSIVE  =
-===================== */
-@media (max-width:980px){
-  .cards{ grid-template-columns:1fr; }
-  .card{ min-height:360px; }
-  .card.stream{ min-height:auto; }
-  /* Reset tilt/skew on mobile */
-  .card.left, .card.right { transform: none !important; }
-}
-</style>
+            .gallery {
+                gap: 6px;
+                margin-bottom: 6px;
+            }
+			
+        }
+		
+		
+    </style>
 </head>
+
+<h1>yojimboyd</h1>
+
 <body>
 
-<!-- =============================
-= SECTION: AMBIENT LAYER MOUNTS  =
-============================== -->
-<div class="shadow-stream" aria-hidden="true"></div>
-<div class="fog" aria-hidden="true"></div>
-<div class="glass-smear" aria-hidden="true"></div>
-
-<!-- =================
-= SECTION: CONTENT  =
-================= -->
-<div class="scene">
-  <!-- Title -->
-  <div class="header">
-    <div class="wordmark-wrap">
-      <img src="images/title.svg" alt="James Boyd" class="title-svg">
+    <!-- Three portraits -->
+    <div class="gallery three">
+        <img src="images/harry1.jpg" alt="">
+        <img src="images/keir4bw.jpg" alt="">
+        <img src="images/steelGitTweak.jpg" alt="">
     </div>
-  </div>
 
-  <!-- Background lyric board -->
-  <div class="lyric-board" id="lyric-board"></div>
+    <!-- Two landscapes -->
+    <div class="gallery two">
+        <img src="images/room4.jpg" alt="">
+        <img src="images/dannyDrums2.jpg" alt="">
+    </div>
 
-  <!-- Cards -->
-  <div class="cards" id="cards">
+    <!-- Three more portraits -->
+    <div class="gallery three">
+        <img src="images/danny1.jpg" alt="">
+        <img src="images/harry5.jpg" alt="">
+        <img src="images/dannyDrums.jpg" alt="">
+    </div>
+	
+	<div class="lightbox" id="lightbox">
 
-    <!-- ===== CARD: VIDEO ===== -->
-    <article class="card video left">
-      <div class="inside">
-        <iframe
-          src="https://www.youtube.com/embed/5g09jWyo_8k"
-          title="James Boyd — Live"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowfullscreen></iframe>
-      </div>
-    </article>
+    <button class="close" id="close">&times;</button>
 
-    <!-- ===== CARD: DATES ===== -->
-    <article class="card dates right">
-      <div class="inside">
-        <ul class="dates-list" id="dates-list"></ul>
-      </div>
-    </article>
+    <img id="lightbox-image" src="" alt="">
 
-    <!-- ===== CARD: STREAM + LINKS ===== -->
-    <article class="card stream left">
-      <div class="inside">
-        <button id="open-stream" class="stream-cta" aria-haspopup="dialog" aria-controls="stream-modal">
-          STREAM 'INTO PIECES'
-        </button>
-        <a href="https://www.paypal.com/donate/?hosted_button_id=3WC6SA2FU9JRA" target="_blank" rel="noopener" class="stream-cta donation-btn">SUPPORT</a>
-        <a href="https://www.tiktok.com/@yojimboyd" target="_blank" rel="noopener" class="stream-cta tiktok-btn">TIKTOK</a>
-        <a href="https://www.instagram.com/yojimboyd/" target="_blank" rel="noopener" class="stream-cta insta-btn">INSTAGRAM</a>
-      </div>
-    </article>
+	</div>
 
-    <!-- ===== CARD: ABOUT / BIO ===== -->
-    <article class="card about right">
-      <div class="inside">
-        <div class="scroll-art" aria-hidden="true">
-          <span class="ring ring-a"></span>
-          <span class="ring ring-b"></span>
-          <span class="beam"></span>
-          <span class="dust"></span>
-        </div>
+    <!-- Email -->
+    <a class="email" href="mailto:yojimboyd@gmail.com">
+        yojimboyd@gmail.com
+    </a>
+	
+	<script>
 
-        <h3 class="about-title">About James Boyd</h3>
-        <p class="about-copy">
-          London singer–songwriter weaving indie textures with heartfelt lyrics.
-          Live sets that feel intimate yet electric; songs about late nights,
-          city lights, and finding your people.
-        </p>
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImage = document.getElementById('lightbox-image');
+    const closeButton = document.getElementById('close');
 
-        <a href="about.html" class="stream-cta about-btn">Read More</a>
-      </div>
-    </article>
+    // Open photograph
+    document.querySelectorAll('.gallery img').forEach(image => {
 
-  </div>
-</div>
+        image.addEventListener('click', () => {
+            lightboxImage.src = image.src;
+            lightboxImage.alt = image.alt;
+            lightbox.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        });
 
-<footer>© <span id="year"></span> James Boyd</footer>
-
-<!-- =====================
-= SECTION: DATES (DATA)  =
-====================== -->
-<script id="dates-data" type="application/json">
-[
-  { "date":"2025-06-27", "time":"19:00", "city":"The Old Frizzle, Wimbledon" },
-  { "date":"2025-06-28", "time":"19:00", "city":"The Regent, Balham" },
-  { "date":"2025-07-20", "time":"14:00", "city":"The Old Justice" },
-  { "date":"2025-07-27", "time":"14:00", "city":"Merton Abbey Mills" },
-  { "date":"2025-08-03", "time":"12:00", "city":"The Piazza, Wimbledon" },
-  { "date":"2025-08-10", "time":"16:30", "city":"The Old Justice, Bermondsey" },
-  { "date":"2025-08-16", "time":"14:00", "city":"Merton Abbey Mills" },
-  { "date":"2025-09-06", "time":"12:30", "city":"Merton Abbey Mills" },
-  { "date":"2025-09-14", "time":"12:30", "city":"Merton Abbey Mills" },
-  { "date":"2025-09-17", "time":"19:00", "city":"Hard Rock Cafe, Piccadilly Circus" },
-  { "date":"2025-09-18", "time":"18:30", "city":"Hard Rock Cafe, Old Park Lane" },
-  { "date":"2025-09-21", "time":"12:00", "city":"The Piazza, Wimbledon" }
-]
-</script>
-
-<!-- ======================
-= SECTION: LYRICS (DATA)  =
-======================= -->
-<script id="lyrics-data" type="application/json">
-[
-  "faces through the trees",
-  "they're here for me.",
-  "shame on them",
-  "no telling him",
-  "walls were coming down",
-  "stars on the ceiling",
-  "darkness dreaming",
-  "under a belt of suns",
-  "sky has fallen in",
-  "cast to the wind",
-  "it's too late",
-  "spit it out",
-  "make a sound",
-  "who do I owe this to?",
-  "where's the line?",
-  "running through?",
-  "can't be mine...",
-  "all mine to lose?",
-  "cells divide",
-  "into pieces",
-  "all those days",
-  "what's wrong with me?",
-  "all the worry left",
-  "blip on the radar",
-  "smudge on the screen",
-  "oh just a hiccup",
-  "in the programming",
-  "sound on the sonar",
-  "up from the deep",
-  "it's just ice cracking",
-  "where I should be",
-  "slip of the tongue",
-  "haunts you",
-  "at midnight",
-  "with other lies",
-  "we're the lovers",
-  "strangers wanting more",
-  "my foot in the door",
-  "one of those faces",
-  "somehow just believed",
-  "dreamt her up for me",
-  "her name in a song",
-  "to be a muse",
-  "paint her wrong",
-  "life's so very long",
-  "little genre piece",
-  "modern horror",
-  "ain't the universe",
-  "where my piece belongs",
-  "bent out of shape",
-  "looking wrong",
-  "make bets so long",
-  "if I just stay strong",
-  "at night",
-  "we all want a witness",
-  "leave the light on",
-  "you're the one",
-  "who did this",
-  "life began",
-  "wasted my youth",
-  "to start again",
-  "make a friend",
-  "after glow",
-  "a time I felt at home",
-  "giant sky",
-  "world below",
-  "long burnt cold",
-  "the wave that comes",
-  "i'd be there",
-  "looking back",
-  "waves rolling",
-  "out of reach",
-  "someone was yelling",
-  "head in the sand",
-  "time is upon us",
-  "man with no plan",
-  "as it stands",
-  "can't feel the sand",
-  "treading water",
-  "losing sight of land",
-  "drowning at a glance",
-  "one day will come",
-  "all for naught",
-  "all those things",
-  "everything not taken",
-  "left behind",
-  "wave in the wake",
-  "gonna be okay",
-  "gonna be alright",
-  "gonna be just fine"
-]
-</script>
-
-<!-- ==========================
-= SECTION: PAGE INTERACTIONS  =
-=========================== -->
-<script>
-/* Footer year */
-document.getElementById('year').textContent = new Date().getFullYear();
-
-/* Date util */
-function parseLocalDate(iso){
-  const [y,m,d] = iso.split('-').map(Number);
-  return new Date(y,(m-1),d);
-}
-
-/* Render dates: upcoming, then backfill past, chronological */
-(() => {
-  const list = document.getElementById('dates-list');
-  const raw = document.getElementById('dates-data');
-  if (!list || !raw) return;
-
-  let items = [];
-  try { items = JSON.parse(raw.textContent.trim()); } catch(e){ items = []; }
-
-  const today = new Date(); today.setHours(0,0,0,0);
-  const withDates = items.map(it => ({...it, _d: parseLocalDate(it.date)}));
-  const upcoming = withDates.filter(it => it._d >= today).sort((a,b)=>a._d-b._d);
-  const past     = withDates.filter(it => it._d <  today).sort((a,b)=>a._d-b._d);
-
-  const TARGET = 9;
-  let result = [...upcoming];
-  if (result.length < TARGET){
-    const need = TARGET - result.length;
-    result = result.concat(past.slice(-need));
-  }
-  result.sort((a,b)=>a._d-b._d);
-
-  list.innerHTML = result.map(it=>{
-    const pretty = it._d.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'2-digit'});
-    const time = it.time ? ` <small>${it.time}</small>` : "";
-    const isPast = it._d < today;
-    return `<li class="${isPast?'past':''}">
-      <strong>${pretty}${time}</strong>
-      <span> — ${it.city||""}</span>
-    </li>`;
-  }).join('');
-})();
-
-/* Build the lyric board — staggered smoke lines */
-(() => {
-  const mount = document.getElementById('lyric-board');
-  const raw = document.getElementById('lyrics-data');
-  if (!mount || !raw) return;
-
-  let lines = [];
-  try { lines = JSON.parse(raw.textContent.trim()); } catch(e){ lines = []; }
-  if (!lines.length) return;
-
-  lines = lines.sort(()=>Math.random()-0.5);
-  const take = Math.min(lines.length, 19);
-  const STAGGER = 2.2;
-  for (let i=0;i<take;i++){
-    const d = document.createElement('div');
-    d.className = 'line';
-    d.textContent = lines[i].toUpperCase();
-    d.dataset.text = d.textContent;
-    d.style.animationDelay = `${i*STAGGER}s`;
-    d.style.setProperty('--smoke-delay', `${i*STAGGER}s`);
-    mount.appendChild(d);
-  }
-})();
-
-/* STREAM modal JS */
-(() => {
-  const openBtn = document.getElementById('open-stream');
-  const modal   = document.getElementById('stream-modal');
-  const closeBtn= document.getElementById('close-stream');
-  const grid    = document.getElementById('stream-grid');
-
-  if (!openBtn || !modal) return;
-
-  function openModal(){
-    modal.classList.add('open');
-    modal.setAttribute('aria-hidden','false');
-    Array.from(grid?.children || []).forEach((el,i)=>{
-      el.style.animationDelay = `${0.08 * i + 0.12}s`;
     });
-    closeBtn?.focus();
-  }
-  function closeModal(){
-    modal.classList.remove('open');
-    modal.setAttribute('aria-hidden','true');
-    openBtn?.focus();
-  }
 
-  openBtn.addEventListener('click', openModal);
-  closeBtn?.addEventListener('click', closeModal);
-  modal.addEventListener('click', (e)=>{ if (e.target === modal) closeModal(); });
-  window.addEventListener('keydown', (e)=>{ if (modal.classList.contains('open') && e.key === 'Escape') closeModal(); });
-})();
-</script>
+    // Close photograph
+    function closeLightbox() {
+        lightbox.style.display = 'none';
+        lightboxImage.src = '';
+        document.body.style.overflow = '';
+    }
 
-<!-- =====================
-= SECTION: STREAM MODAL =
-===================== -->
-<div class="stream-modal" id="stream-modal" role="dialog" aria-modal="true" aria-labelledby="stream-title" aria-hidden="true">
-  <div class="stream-panel">
-    <h2 id="stream-title" class="stream-title">Stream “Into Pieces”</h2>
+    closeButton.addEventListener('click', closeLightbox);
 
-    <div class="stream-grid" id="stream-grid">
-      <a class="stream-link cyan"   href="https://open.spotify.com/album/0a3edtdtT85aYlUaVcSBta?si=54cuabmkRwi3AV9nAxSvEQ" target="_blank" rel="noopener"><span>Spotify</span></a>
-      <a class="stream-link amber"  href="https://music.apple.com/ua/album/into-pieces-ep/1799751367" target="_blank" rel="noopener"><span>Apple Music</span></a>
-      <a class="stream-link violet" href="https://www.amazon.com/Into-Pieces-James-Boyd/dp/B0DZ1DF8BY" target="_blank" rel="noopener"><span>Amazon Music</span></a>
-      <a class="stream-link mint"   href="#" target="_blank" rel="noopener"><span>TIDAL</span> <small>(coming soon)</small></a>
-      <a class="stream-link cyan"   href="https://music.youtube.com/search?q=James%20Boyd%20Into%20Pieces" target="_blank" rel="noopener"><span>YouTube Music</span></a>
-      <a class="stream-link amber"  href="https://soundcloud.com/search?q=James%20Boyd%20Into%20Pieces" target="_blank" rel="noopener"><span>SoundCloud</span></a>
-    </div>
+    // Close when clicking outside photograph
+    lightbox.addEventListener('click', (event) => {
+        if (event.target === lightbox) {
+            closeLightbox();
+        }
+    });
 
-    <div class="stream-actions">
-      <button class="btn-ghost" id="close-stream">Close</button>
-    </div>
-  </div>
-</div>
+    // Close with Escape key
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            closeLightbox();
+        }
+    });
+
+	</script>
 
 </body>
+
 </html>
+
